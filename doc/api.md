@@ -66,12 +66,12 @@
 
 ## 参与端（无需登录）
 
-- POST `/api/participation/checkin`
+- POST `/api/checkins/checkin`
   - 入参：`{ token, teaching_point_id, attendee_count }`
   - 业务校验：二维码为`checkin`类型、有效且未禁用；活动进行中；人数为正整数。
   - 出参：`{ success: true, submitted_at }`
 
-- POST `/api/participation/evaluate`
+- POST `/api/checkins/evaluate`
   - 入参：`{ token, teaching_point_id, q1_satisfaction, q2_practicality, q3_quality?, suggestion_text? }`
   - 业务校验：二维码为`evaluation`类型、有效且未禁用；验证该教学点参与过该活动。
   - 出参：`{ success: true, submitted_at }`
