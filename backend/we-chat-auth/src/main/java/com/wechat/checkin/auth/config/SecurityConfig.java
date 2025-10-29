@@ -54,21 +54,9 @@ public class SecurityConfig {
                 
                 // 配置请求授权
                 .authorizeHttpRequests(authz -> authz
-                        // 允许登录接口无需认证
-                        .requestMatchers("/api/auth/login", "/api/auth/refresh").permitAll()
-                        
-                        // 允许健康检查接口
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                        
-                        // 允许API文档接口
-                        .requestMatchers("/doc.html", "/webjars/**", "/swagger-resources/**", 
-                                        "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        
-                        // 允许静态资源
-                        .requestMatchers("/static/**", "/favicon.ico").permitAll()
-                        
-                        // 其他所有请求都需要认证（通过拦截器处理）
-                        .anyRequest().authenticated()
+                        // 允许所有请求通过Spring Security
+                        // 实际的认证和权限控制由AuthInterceptor和DataPermissionInterceptor处理
+                        .anyRequest().permitAll()
                 )
                 
                 // 禁用默认登录页面

@@ -14,31 +14,105 @@
 - 数据看板：总览卡片与图表，10分钟自动刷新
 - 审计日志：关键操作留痕
 
+## 技术栈
+
+### 核心框架
+- **Java**: JDK 17
+- **Spring Boot**: 3.5.7
+- **Spring Security**: 集成于Spring Boot 3.5.7
+- **构建工具**: Maven 多模块（Maven Wrapper）
+
+### 数据持久化
+- **数据库**: MySQL 8.0.33
+- **ORM框架**: 
+  - MyBatis 3.0.5 (mybatis-spring-boot-starter)
+  - MyBatis Plus 3.5.14 (mybatis-plus-spring-boot3-starter)
+
+### 安全认证
+- **JWT**: JJWT 0.12.6 (jjwt-api, jjwt-impl, jjwt-jackson)
+- **密码加密**: BCrypt (Spring Security Crypto)
+
+### 工具库
+- **Hutool**: 5.8.22 (全工具集)
+- **MapStruct**: 1.5.5.Final (对象映射)
+- **Lombok**: 1.18.30 (代码简化)
+- **Jackson**: 随Spring Boot提供 (JSON处理)
+
+### API文档
+- **SpringDoc OpenAPI**: 2.8.8
+- **Knife4j**: 4.4.0 (支持Jakarta EE)
+
+### 其他组件
+- **Spring Boot Validation**: 参数校验
+- **Spring Boot Actuator**: 健康检查与监控
+- **Spring Boot AOP**: 切面编程支持
+
 ## 仓库结构
 
 ```
-backend/     # 后端服务（API、Auth、活动、二维码、参与、评价、看板、审计）
-database/    # 迁移脚本、初始化数据（县域、教学点字典等）
-doc/         # 项目文档（版本 5 方案、API、数据库、架构、任务清单等）
-README.md    # 项目说明
+backend/
+├── we-chat-common/     # 公共模块（工具类、异常、响应封装、常量、枚举）
+├── we-chat-auth/       # 认证授权模块（JWT、登录、权限校验）
+├── we-chat-web/        # Web启动模块（主启动类、配置、API接口）
+└── pom.xml             # Maven父项目配置
+sql/                    # 数据库脚本（建表、初始化数据）
+doc/                    # 项目文档（设计方案、API、数据库、架构、任务清单）
+README.md               # 项目说明
 ```
 
-## 快速开始（示例）
+## 快速开始
 
-1) 安装依赖
-- 在后端目录执行：`npm install`
+### 1. 环境要求
+- JDK 17+
+- Maven 3.6+（或使用项目自带的Maven Wrapper）
+- MySQL 8.0+
 
-2) 配置环境变量（示例）
-- `DB_URL` 数据库连接串
-- `JWT_SECRET` 鉴权密钥
-- `REDIS_URL` 缓存
-- `BASE_URL` 后端服务地址（用于二维码深链）
+### 2. 数据库初始化
+```bash
+# 执行SQL脚本
+mysql -u root -p < sql/create_tables.sql
+mysql -u root -p < sql/init_admin_data.sql
+```
 
-3) 启动后端（示例）
-- `npm run dev`（具体以 backend 下脚本为准）
+### 3. 配置环境变量
+在 `backend/we-chat-web/src/main/resources/application-dev.yml` 中配置：
+- `DB_URL`: 数据库连接字符串
+- `JWT_SECRET`: JWT令牌签名密钥
+- `REDIS_URL`: Redis缓存服务地址（可选）
+- `BASE_URL`: 后端服务基础URL（用于生成二维码深链）
 
-4) 文档与接口
-- 参阅 `doc/` 下：`功能概述`、`系统架构说明`、`数据库设计/补充`、`后端/前端开发任务清单`、`总体任务清单`、`api.md`。
+### 4. 构建与启动
+```bash
+# 进入后端目录
+cd backend
+
+# 使用Maven Wrapper构建（推荐）
+./mvnw clean install
+
+# 或使用本地Maven
+mvn clean install
+
+# 启动应用
+cd we-chat-web
+../mvnw spring-boot:run
+
+# 或使用本地Maven
+mvn spring-boot:run
+```
+
+### 5. 访问接口文档
+启动成功后访问：
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- Knife4j文档: http://localhost:8080/doc.html
+
+### 6. 项目文档
+参阅 `doc/` 目录下的详细文档：
+- `打卡小程序（版本 5）设计方案.md` - 整体设计方案
+- `系统架构说明.md` - 系统架构设计
+- `数据库设计文档.md` - 数据库设计详情
+- `api.md` - API接口文档
+- `后端任务清单.md` - 后端开发任务
+- `SpringBoot多模块项目基础架构搭建详细步骤.md` - 架构搭建指南
 
 ## 部署与运维（摘要）
 

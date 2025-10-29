@@ -1,6 +1,7 @@
 package com.wechat.checkin.auth.controller;
 
 import com.wechat.checkin.auth.dto.LoginRequest;
+import com.wechat.checkin.auth.security.UserPrincipal;
 import com.wechat.checkin.auth.service.AuthService;
 import com.wechat.checkin.auth.vo.LoginResponse;
 import com.wechat.checkin.common.response.Result;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,8 +44,9 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "管理员登录", description = "市级或县级管理员使用用户名和密码登录")
     public Result<LoginResponse> login(@Validated @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
-        
         String clientIp = IpUtils.getClientIp(request);
+
+        log.info("用户登录: username={}, ip={}", loginRequest.getUsername(), clientIp);
         LoginResponse response = authService.login(loginRequest, clientIp);
         
         return Result.success(response);
@@ -76,14 +79,24 @@ public class AuthController {
     @PostMapping("/logout")
     @Operation(summary = "管理员登出", description = "销毁当前会话，令牌失效")
     public Result<Void> logout(HttpServletRequest request) {
-        
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String accessToken = authHeader.substring(7);
-            authService.logout(accessToken);
+        try {
+            String authHeader = request.getHeader("Authorization");
+            log.info("管理员登出: authHeader={}", authHeader != null ? "present" : "missing");
+            
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String accessToken = authHeader.substring(7);
+                authService.logout(accessToken);
+                log.info("管理员登出成功");
+            } else {
+                log.warn("登出请求未携带有效token，直接返回成功");
+            }
+            
+            return Result.success();
+        } catch (Exception e) {
+            // 即使登出失败也返回成功，因为前端已经清除token
+            log.warn("登出处理异常，但仍返回成功: {}", e.getMessage());
+            return Result.success();
         }
-        
-        return Result.success();
     }
 
     /**
@@ -107,31 +120,20 @@ public class AuthController {
     /**
      * 获取当前用户信息
      *
-     * @param request HTTP请求
+     * @param principal 当前登录用户
      * @return 用户信息
      */
     @GetMapping("/me")
     @Operation(summary = "获取当前用户信息", description = "根据访问令牌获取当前登录用户的基本信息")
-    public Result<LoginResponse.UserInfo> getCurrentUser(HttpServletRequest request) {
-        
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Result.error("缺少访问令牌");
-        }
-        
-        String token = authHeader.substring(7);
-        
-        // 验证令牌
-        if (!authService.validateToken(token)) {
-            return Result.error("访问令牌无效");
-        }
+    public Result<LoginResponse.UserInfo> getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
+        log.info("获取当前用户信息: userId={}, username={}", principal.getId(), principal.getUsername());
         
         // 构建用户信息
         LoginResponse.UserInfo userInfo = LoginResponse.UserInfo.builder()
-                .id(authService.getUserIdFromToken(token))
-                .username(authService.getUsernameFromToken(token))
-                .role(authService.getRoleFromToken(token))
-                .countyCode(authService.getCountyCodeFromToken(token))
+                .id(principal.getId())
+                .username(principal.getUsername())
+                .role(principal.getRole())
+                .countyCode(principal.getCountyCode())
                 .build();
         
         return Result.success(userInfo);

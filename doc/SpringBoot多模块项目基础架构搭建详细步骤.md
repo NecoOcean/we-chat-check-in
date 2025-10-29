@@ -54,13 +54,55 @@
 
 - 关键操作审计、日志记录
 ## 技术栈配置要点
-- Spring Boot : 2.7+
-- 数据库 : MySQL 8.0+ + HikariCP
-- 安全 : Spring Security + JWT
-- 工具库 : Hutool、MapStruct、Validation
-- 二维码 : ZXing
-- 文档 : Swagger3/Knife4j
-- 构建 : Maven多模块
+
+### 核心框架
+- **Java 版本**：JDK 17
+- **Spring Boot**：3.5.7
+- **Spring Security**：随Spring Boot 3.5.7提供
+- **构建工具**：Maven 多模块（Maven Wrapper）
+
+### 数据持久化
+- **数据库**：MySQL 8.0.33
+- **ORM 框架**：
+  - MyBatis：3.0.5（mybatis-spring-boot-starter）
+  - MyBatis Plus：3.5.14（mybatis-plus-spring-boot3-starter）
+  - MyBatis Plus JSqlParser：3.5.14
+
+### 安全认证
+- **Spring Security**：集成于Spring Boot 3.5.7
+- **JWT**：JJWT 0.12.6
+  - jjwt-api
+  - jjwt-impl
+  - jjwt-jackson
+
+### 工具库
+- **Hutool**：5.8.22（全工具集）
+- **MapStruct**：1.5.5.Final（对象映射）
+- **Lombok**：1.18.30（代码简化）
+- **Jackson**：随Spring Boot提供（JSON处理）
+
+### API文档
+- **SpringDoc OpenAPI**：2.8.8（springdoc-openapi-starter-webmvc-ui）
+- **Knife4j**：4.4.0（knife4j-openapi3-jakarta-spring-boot-starter）
+
+### 测试框架
+- **Spring Boot Test**：随Spring Boot提供
+- **Spring Security Test**：随Spring Security提供
+
+### 其他组件
+- **Spring Boot Validation**：参数校验
+- **Spring Boot Actuator**：健康检查与监控
+- **Spring Boot AOP**：切面编程支持
+
+### Maven插件
+- **maven-compiler-plugin**：3.11.0
+- **maven-surefire-plugin**：3.0.0
+- **spring-boot-maven-plugin**：3.5.7
+
+### 注意事项
+- 项目使用 **Jakarta EE** 规范（Spring Boot 3.x要求）
+- 二维码功能（ZXing）暂未启用，在父pom中已注释
+- 编码统一使用 **UTF-8**
 ## 执行原则
 1. 严格按优先级执行 ：先完成高优先级模块，确保核心功能可用
 2. 模块间依赖管理 ：common模块为基础，其他模块依赖common

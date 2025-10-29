@@ -1,5 +1,6 @@
 package com.wechat.checkin.web.config;
 
+import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 1.0.0
  */
 @Configuration
+@EnableKnife4j
 public class OpenApiConfig {
 
     private static final String SECURITY_SCHEME_NAME = "bearerAuth";
@@ -56,6 +58,8 @@ public class OpenApiConfig {
                 .type(SecurityScheme.Type.HTTP)
                 .scheme("bearer")
                 .bearerFormat("JWT")
-                .description("请输入JWT Token，格式：Bearer {token}");
+                .in(SecurityScheme.In.HEADER)
+                .name("Authorization")
+                .description("请输入JWT Token（不需要Bearer前缀，系统会自动添加）");
     }
 }

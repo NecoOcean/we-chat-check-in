@@ -118,4 +118,4 @@ yarn-error.log*
 Dockerfile.local
 
 .xcodemap
-log/
+backend/log/

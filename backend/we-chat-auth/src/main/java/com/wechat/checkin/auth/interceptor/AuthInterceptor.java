@@ -83,6 +83,8 @@ public class AuthInterceptor implements HandlerInterceptor {
      */
     private String extractTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
+        log.debug("Authorization header: {}", bearerToken != null ? bearerToken.substring(0, Math.min(50, bearerToken.length())) + "..." : "null");
+        
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
