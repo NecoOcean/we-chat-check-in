@@ -34,6 +34,8 @@ public enum ResultCode {
 
     // 业务错误 1xxx
     BUSINESS_ERROR(1000, "业务处理失败"),
+    SYSTEM_ERROR(1001, "系统错误"),
+    PARAM_ERROR(1002, "参数错误"),
     
     // 用户相关错误 11xx
     USER_NOT_FOUND(1101, "用户不存在"),

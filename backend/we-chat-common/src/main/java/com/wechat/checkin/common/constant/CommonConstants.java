@@ -199,12 +199,33 @@ public final class CommonConstants {
     public static final long DEFAULT_PAGE_NUM = 1L;
 
     /**
-     * 默认每页大小
+     * 默认页面大小
      */
     public static final long DEFAULT_PAGE_SIZE = 10L;
 
     /**
-     * 最大每页大小
+     * 最大页面大小
      */
     public static final long MAX_PAGE_SIZE = 1000L;
+
+    // ==================== 用户角色常量 ====================
+
+    /**
+     * 用户角色常量
+     */
+    public static class UserRole {
+        /** 市级管理员 */
+        public static final String CITY_ADMIN = "CITY_ADMIN";
+        /** 县级管理员 */
+        public static final String COUNTY_ADMIN = "COUNTY_ADMIN";
+        /** 普通用户 */
+        public static final String USER = "USER";
+    }
+
+    // ==================== 请求属性常量 ====================
+
+    /**
+     * 县域代码请求属性名
+     */
+    public static final String COUNTY_CODE_ATTR = "currentCountyCode";
 }

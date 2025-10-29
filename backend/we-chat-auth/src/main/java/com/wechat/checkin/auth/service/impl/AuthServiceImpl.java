@@ -68,8 +68,9 @@ public class AuthServiceImpl implements AuthService {
                 admin.getUsername()
         );
 
-        // 5. 更新最后登录信息
+        // 5. 更新最后登录信息和登录次数
         adminMapper.updateLastLoginInfo(admin.getId(), LocalDateTime.now(), clientIp);
+        adminMapper.incrementLoginCount(admin.getId());
 
         // 6. 构建响应
         LoginResponse.UserInfo userInfo = LoginResponse.UserInfo.builder()

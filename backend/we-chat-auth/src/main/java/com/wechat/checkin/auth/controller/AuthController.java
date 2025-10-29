@@ -3,6 +3,8 @@ package com.wechat.checkin.auth.controller;
 import com.wechat.checkin.auth.dto.LoginRequest;
 import com.wechat.checkin.auth.service.AuthService;
 import com.wechat.checkin.auth.vo.LoginResponse;
+import com.wechat.checkin.common.annotation.AuditLog;
+import com.wechat.checkin.common.constant.BusinessConstants;
 import com.wechat.checkin.common.response.Result;
 import com.wechat.checkin.common.util.IpUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +44,13 @@ public class AuthController {
      */
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "管理员用户登录，返回JWT访问令牌和刷新令牌")
+    @AuditLog(
+        value = "用户登录",
+        operationType = BusinessConstants.OperationType.LOGIN,
+        module = BusinessConstants.BusinessModule.AUTH,
+        recordParams = true,
+        recordResult = false
+    )
     public Result<LoginResponse> login(
             @Valid @RequestBody LoginRequest loginRequest,
             HttpServletRequest request) {
@@ -78,6 +87,13 @@ public class AuthController {
      */
     @PostMapping("/logout")
     @Operation(summary = "用户登出", description = "用户登出，使当前访问令牌失效")
+    @AuditLog(
+        value = "用户登出",
+        operationType = BusinessConstants.OperationType.LOGOUT,
+        module = BusinessConstants.BusinessModule.AUTH,
+        recordParams = false,
+        recordResult = false
+    )
     public Result<Void> logout(HttpServletRequest request) {
         
         String authHeader = request.getHeader("Authorization");

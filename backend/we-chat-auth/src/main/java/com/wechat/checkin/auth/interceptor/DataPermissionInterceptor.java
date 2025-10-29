@@ -1,0 +1,90 @@
+package com.wechat.checkin.auth.interceptor;
+
+import com.wechat.checkin.auth.annotation.RequireDataPermission;
+import com.wechat.checkin.auth.security.JwtTokenProvider;
+import com.wechat.checkin.common.constant.CommonConstants;
+import com.wechat.checkin.common.exception.BusinessException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * 数据权限拦截器
+ * 实现县域数据权限控制，确保县级管理员只能访问本县数据
+ * 
+ * @author system
+ * @since 2024-01-01
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class DataPermissionInterceptor implements HandlerInterceptor {
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 只处理Controller方法
+        if (!(handler instanceof HandlerMethod)) {
+            return true;
+        }
+
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        RequireDataPermission annotation = handlerMethod.getMethodAnnotation(RequireDataPermission.class);
+        
+        // 如果没有数据权限注解，直接通过
+        if (annotation == null) {
+            return true;
+        }
+
+        // 获取JWT令牌
+        String token = extractToken(request);
+        if (token == null) {
+            throw new BusinessException("未找到访问令牌");
+        }
+
+        // 验证令牌并获取用户信息
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new BusinessException("访问令牌无效");
+        }
+
+        String userId = String.valueOf(jwtTokenProvider.getUserIdFromToken(token));
+        String userRole = jwtTokenProvider.getRoleFromToken(token);
+        
+        // 如果是市级管理员，可以访问所有数据
+        if (CommonConstants.UserRole.CITY_ADMIN.equals(userRole)) {
+            return true;
+        }
+        
+        // 如果是县级管理员，需要验证数据权限
+        if (CommonConstants.UserRole.COUNTY_ADMIN.equals(userRole)) {
+            String countyCode = jwtTokenProvider.getCountyCodeFromToken(token);
+            if (countyCode == null) {
+                throw new BusinessException("县级管理员缺少县域信息");
+            }
+            
+            // 将县域代码设置到请求属性中，供后续业务逻辑使用
+            request.setAttribute(CommonConstants.COUNTY_CODE_ATTR, countyCode);
+            return true;
+        }
+        
+        // 普通用户不允许访问需要数据权限的接口
+        throw new BusinessException("权限不足，无法访问该资源");
+    }
+
+    /**
+     * 从请求中提取JWT令牌
+     */
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
+    }
+}

@@ -50,11 +50,20 @@ public interface AdminMapper extends BaseMapper<Admin> {
     int countByUsername(@Param("username") String username);
 
     /**
-     * 根据县级代码查询管理员数量
+     * 检查县域代码下的管理员数量
      *
-     * @param countyCode 县级代码
+     * @param countyCode 县域代码
      * @return 管理员数量
      */
     @Select("SELECT COUNT(*) FROM admins WHERE county_code = #{countyCode} AND deleted = 0")
     int countByCountyCode(@Param("countyCode") String countyCode);
+
+    /**
+     * 增加登录次数
+     *
+     * @param id 管理员ID
+     * @return 更新行数
+     */
+    @Update("UPDATE admins SET login_count = login_count + 1, updated_at = NOW() WHERE id = #{id}")
+    int incrementLoginCount(@Param("id") Long id);
 }
