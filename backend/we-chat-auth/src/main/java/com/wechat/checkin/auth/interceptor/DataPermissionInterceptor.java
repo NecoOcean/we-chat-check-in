@@ -55,7 +55,6 @@ public class DataPermissionInterceptor implements HandlerInterceptor {
             throw new BusinessException(ResultCode.TOKEN_INVALID);
         }
 
-        String userId = String.valueOf(jwtTokenProvider.getUserIdFromToken(token));
         String userRole = jwtTokenProvider.getRoleFromToken(token);
         
         // 如果是市级管理员，可以访问所有数据

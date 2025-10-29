@@ -8,11 +8,11 @@ SET NAMES utf8mb4;
 -- 注意：实际部署时应该使用更强的密码和更高的加密轮数
 INSERT INTO `admins` (
     `username`, 
-    `password_hash`, 
+    `password`, 
     `role`, 
     `county_code`, 
     `status`, 
-    `created_at`
+    `created_time`
 ) VALUES (
     'admin',
     '$2a$10$N.zmdr9k7uOCQb0bMs/OdOUBqvCD2XGb67f8UjvMUfQH.q/pzUzem', -- admin123
@@ -21,9 +21,9 @@ INSERT INTO `admins` (
     'enabled',
     NOW()
 ) ON DUPLICATE KEY UPDATE
-    `password_hash` = VALUES(`password_hash`),
+    `password` = VALUES(`password`),
     `status` = VALUES(`status`),
-    `updated_at` = NOW();
+    `updated_time` = NOW();
 
 -- 验证插入结果
 SELECT 
@@ -32,7 +32,7 @@ SELECT
     role,
     county_code,
     status,
-    created_at
+    created_time
 FROM `admins` 
 WHERE `username` = 'admin' AND `role` = 'city';
 

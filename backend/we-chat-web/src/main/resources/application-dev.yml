@@ -16,7 +16,7 @@ spring:
 
 # JWT配置 - 开发环境（较短过期时间便于测试）
 jwt:
-  secret: wechat-checkin-dev-jwt-secret-key-2024
+  secret: wechat-checkin-dev-jwt-secret-key-2024-must-be-at-least-512-bits-long-for-hs512-algorithm-security
   access-token-expiration: 3600000  # 1小时
   refresh-token-expiration: 86400000  # 1天
 

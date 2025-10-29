@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
  * 登录响应VO
  * 
@@ -72,10 +70,5 @@ public class LoginResponse {
          * 县级代码
          */
         private String countyCode;
-
-        /**
-         * 最后登录时间
-         */
-        private LocalDateTime lastLoginTime;
     }
 }

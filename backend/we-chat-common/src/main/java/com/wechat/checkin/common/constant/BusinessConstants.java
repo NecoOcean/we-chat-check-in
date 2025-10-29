@@ -44,9 +44,9 @@ public class BusinessConstants {
     @Deprecated
     public static class QrCodeStatus {
         /** 激活状态 */
-        public static final String ACTIVE = QrCodeStatusEnum.ACTIVE.getValue();
+        public static final String ACTIVE = QrCodeStatusEnum.ENABLED.getValue();
         /** 非激活状态 */
-        public static final String INACTIVE = QrCodeStatusEnum.INACTIVE.getValue();
+        public static final String INACTIVE = QrCodeStatusEnum.DISABLED.getValue();
     }
 
     /**

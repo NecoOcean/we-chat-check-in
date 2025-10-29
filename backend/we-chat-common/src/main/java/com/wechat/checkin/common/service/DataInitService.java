@@ -63,7 +63,7 @@ public class DataInitService implements CommandLineRunner {
 
             // 创建市级管理员账号
             String insertSql = """
-                INSERT INTO admins (username, password_hash, role, county_code, status, created_at) 
+                INSERT INTO admins (username, password, role, county_code, status, created_time) 
                 VALUES (?, ?, ?, NULL, 'enabled', NOW())
                 """;
             
@@ -88,7 +88,7 @@ public class DataInitService implements CommandLineRunner {
     @Transactional
     public void resetAdminPassword() {
         try {
-            String updateSql = "UPDATE admins SET password_hash = ?, updated_at = NOW() WHERE username = ? AND role = ?";
+            String updateSql = "UPDATE admins SET password = ?, updated_time = NOW() WHERE username = ? AND role = ?";
             String hashedPassword = passwordEncoder.encode(ADMIN_PASSWORD);
             int result = jdbcTemplate.update(updateSql, hashedPassword, ADMIN_USERNAME, ADMIN_ROLE);
             

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 /**
  * 二维码状态枚举
- * 对应数据库qrcodes表的status字段：ENUM('active', 'inactive')
+ * 对应数据库qrcodes表的status字段：ENUM('enabled', 'disabled', 'deleted')
  *
  * @author WeChat Check-in System
  * @since 1.0.0
@@ -15,14 +15,19 @@ import lombok.Getter;
 public enum QrCodeStatusEnum {
 
     /**
-     * 激活状态
+     * 启用状态
      */
-    ACTIVE("active", "激活"),
+    ENABLED("enabled", "启用"),
 
     /**
-     * 非激活状态
+     * 禁用状态
      */
-    INACTIVE("inactive", "非激活");
+    DISABLED("disabled", "禁用"),
+
+    /**
+     * 软删除状态
+     */
+    DELETED("deleted", "已删除");
 
     /**
      * 状态值（对应数据库中的enum值）
@@ -50,37 +55,51 @@ public enum QrCodeStatusEnum {
     }
 
     /**
-     * 判断是否为激活状态
+     * 判断是否为启用状态
      */
-    public static boolean isActive(String value) {
-        return ACTIVE.getValue().equals(value);
+    public static boolean isEnabled(String value) {
+        return ENABLED.getValue().equals(value);
     }
 
     /**
-     * 判断是否为非激活状态
+     * 判断是否为禁用状态
      */
-    public static boolean isInactive(String value) {
-        return INACTIVE.getValue().equals(value);
+    public static boolean isDisabled(String value) {
+        return DISABLED.getValue().equals(value);
     }
 
     /**
-     * 判断是否为激活状态
+     * 判断是否为已删除状态
      */
-    public boolean isActiveStatus() {
-        return ACTIVE.equals(this);
+    public static boolean isDeleted(String value) {
+        return DELETED.getValue().equals(value);
     }
 
     /**
-     * 判断是否为非激活状态
+     * 判断是否为启用状态
      */
-    public boolean isInactiveStatus() {
-        return INACTIVE.equals(this);
+    public boolean isEnabledStatus() {
+        return ENABLED.equals(this);
     }
 
     /**
-     * 判断二维码是否可用
+     * 判断是否为禁用状态
+     */
+    public boolean isDisabledStatus() {
+        return DISABLED.equals(this);
+    }
+
+    /**
+     * 判断二维码是否可用（启用状态）
      */
     public boolean isAvailable() {
-        return ACTIVE.equals(this);
+        return ENABLED.equals(this);
+    }
+
+    /**
+     * 判断二维码是否有效（非删除状态）
+     */
+    public boolean isValid() {
+        return !DELETED.equals(this);
     }
 }

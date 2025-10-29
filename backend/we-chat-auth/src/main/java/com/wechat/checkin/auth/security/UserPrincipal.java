@@ -77,7 +77,7 @@ public class UserPrincipal implements UserDetails {
         return UserPrincipal.builder()
                 .id(admin.getId())
                 .username(admin.getUsername())
-                .password(admin.getPasswordHash())
+                .password(admin.getPassword())
                 .role(admin.getRole())
                 .countyCode(admin.getCountyCode())
                 .status(admin.getStatus())

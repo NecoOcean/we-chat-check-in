@@ -29,13 +29,17 @@ public interface AdminMapper extends BaseMapper<Admin> {
 
     /**
      * 更新最后登录信息
+     * 注意：数据库表中已删除last_login_time和last_login_ip字段，此方法保留但不实际使用
+     * 建议：在审计日志中记录登录信息
      *
      * @param id 管理员ID
      * @param lastLoginTime 最后登录时间
      * @param lastLoginIp 最后登录IP
      * @return 更新行数
+     * @deprecated 数据库表中已删除相关字段
      */
-    @Update("UPDATE admins SET last_login_time = #{lastLoginTime}, last_login_ip = #{lastLoginIp}, updated_at = NOW() WHERE id = #{id}")
+    @Deprecated
+    @Update("UPDATE admins SET updated_time = NOW() WHERE id = #{id}")
     int updateLastLoginInfo(@Param("id") Long id, 
                            @Param("lastLoginTime") LocalDateTime lastLoginTime, 
                            @Param("lastLoginIp") String lastLoginIp);
@@ -60,10 +64,13 @@ public interface AdminMapper extends BaseMapper<Admin> {
 
     /**
      * 增加登录次数
+     * 注意：数据库表中已删除login_count字段，此方法保留但不实际使用
      *
      * @param id 管理员ID
      * @return 更新行数
+     * @deprecated 数据库表中已删除相关字段
      */
-    @Update("UPDATE admins SET login_count = login_count + 1, updated_at = NOW() WHERE id = #{id}")
+    @Deprecated
+    @Update("UPDATE admins SET updated_time = NOW() WHERE id = #{id}")
     int incrementLoginCount(@Param("id") Long id);
 }

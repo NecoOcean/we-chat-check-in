@@ -55,8 +55,8 @@
 ## 二维码管理
 
 - POST `/api/activities/:id/qrcodes`
-  - 入参：`{ type: 'checkin'|'evaluation', expire_at? }`
-  - 出参：`{ id, url, token, type, expire_at, status }`
+  - 入参：`{ type: 'checkin'|'evaluation', expire_time? }`
+  - 出参：`{ id, url, token, type, expire_time, status }`
 
 - GET `/api/qrcodes`
   - 过滤：`?activity_id=&type=&status=`；分页。
@@ -69,12 +69,12 @@
 - POST `/api/checkins/checkin`
   - 入参：`{ token, teaching_point_id, attendee_count }`
   - 业务校验：二维码为`checkin`类型、有效且未禁用；活动进行中；人数为正整数。
-  - 出参：`{ success: true, submitted_at }`
+  - 出参：`{ success: true, submitted_time }`
 
 - POST `/api/checkins/evaluate`
   - 入参：`{ token, teaching_point_id, q1_satisfaction, q2_practicality, q3_quality?, suggestion_text? }`
   - 业务校验：二维码为`evaluation`类型、有效且未禁用；验证该教学点参与过该活动。
-  - 出参：`{ success: true, submitted_at }`
+  - 出参：`{ success: true, submitted_time }`
 
 ## 看板与统计
 

@@ -15,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 /**
  * 认证服务实现类
  * 
@@ -45,13 +43,13 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 2. 验证密码
-        if (!passwordEncoder.matches(loginRequest.getPassword(), admin.getPasswordHash())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), admin.getPassword())) {
             log.warn("登录失败: 密码错误, username={}", loginRequest.getUsername());
             throw new BusinessException(ResultCode.PASSWORD_ERROR, "用户名或密码错误");
         }
 
         // 检查账户状态
-        if (!StatusEnum.ENABLED.getCode().equals(admin.getStatus())) {
+        if (!StatusEnum.ENABLED.getValue().equals(admin.getStatus().getValue())) {
             log.warn("登录失败: 账号已禁用, username={}", loginRequest.getUsername());
             throw new BusinessException(ResultCode.USER_DISABLED, "账号已被禁用");
         }
@@ -68,9 +66,9 @@ public class AuthServiceImpl implements AuthService {
                 admin.getUsername()
         );
 
-        // 5. 更新最后登录信息和登录次数
-        adminMapper.updateLastLoginInfo(admin.getId(), LocalDateTime.now(), clientIp);
-        adminMapper.incrementLoginCount(admin.getId());
+        // 5. 更新最后登录信息（如果存在相关字段）
+        // TODO: 数据库表中删除了last_login_time和last_login_ip字段，可在审计日志中记录
+        // adminMapper.updateLastLoginInfo(admin.getId(), LocalDateTime.now(), clientIp);
 
         // 6. 构建响应
         LoginResponse.UserInfo userInfo = LoginResponse.UserInfo.builder()
@@ -78,7 +76,6 @@ public class AuthServiceImpl implements AuthService {
                 .username(admin.getUsername())
                 .role(admin.getRole())
                 .countyCode(admin.getCountyCode())
-                .lastLoginTime(LocalDateTime.now())
                 .build();
 
         LoginResponse response = LoginResponse.builder()
@@ -124,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 5. 检查账号状态
-        if (!StatusEnum.ENABLED.getCode().equals(admin.getStatus())) {
+        if (!StatusEnum.ENABLED.equals(admin.getStatus())) {
             log.warn("刷新令牌失败: 账号已禁用, username={}", username);
             throw new BusinessException(ResultCode.USER_DISABLED, "账号已被禁用");
         }
@@ -143,7 +140,6 @@ public class AuthServiceImpl implements AuthService {
                 .username(admin.getUsername())
                 .role(admin.getRole())
                 .countyCode(admin.getCountyCode())
-                .lastLoginTime(admin.getLastLoginTime())
                 .build();
 
         LoginResponse response = LoginResponse.builder()

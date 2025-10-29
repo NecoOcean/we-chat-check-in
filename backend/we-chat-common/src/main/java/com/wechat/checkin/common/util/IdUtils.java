@@ -3,13 +3,10 @@ package com.wechat.checkin.common.util;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.wechat.checkin.common.exception.BusinessException;
 import com.wechat.checkin.common.response.ResultCode;
-
-import java.security.SecureRandom;
 
 /**
  * ID生成工具类

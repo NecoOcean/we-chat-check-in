@@ -1,9 +1,7 @@
 package com.wechat.checkin.auth.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.wechat.checkin.common.enums.DeletedEnum;
 import com.wechat.checkin.common.enums.StatusEnum;
-import com.wechat.checkin.common.enums.UserRoleEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,8 +34,8 @@ public class Admin {
     /**
      * 密码哈希值
      */
-    @TableField("password_hash")
-    private String passwordHash;
+    @TableField("password")
+    private String password;
 
     /**
      * 角色类型：city-市级管理员，county-县级管理员
@@ -52,60 +50,21 @@ public class Admin {
     private String countyCode;
 
     /**
-     * 账号状态
+     * 账号状态：enabled-启用，disabled-禁用，deleted-软删除
      */
     @TableField("status")
     private StatusEnum status;
 
     /**
-     * 最后登录时间
-     */
-    @TableField("last_login_time")
-    private LocalDateTime lastLoginTime;
-
-    /**
-     * 最后登录IP
-     */
-    @TableField("last_login_ip")
-    private String lastLoginIp;
-
-    /**
      * 创建时间
      */
-    @TableField(value = "created_at", fill = FieldFill.INSERT)
-    private LocalDateTime createdAt;
+    @TableField(value = "created_time", fill = FieldFill.INSERT)
+    private LocalDateTime createdTime;
 
     /**
      * 更新时间
      */
-    @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatedAt;
+    @TableField(value = "updated_time", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedTime;
 
-    /**
-     * 删除标记
-     */
-    @TableField("deleted")
-    @TableLogic
-    private DeletedEnum deleted;
-
-    /**
-     * 创建者ID
-     */
-    @TableField("created_by")
-    private Long createdBy;
-
-    /**
-     * 更新者ID
-     */
-    @TableField("updated_by")
-    private Long updatedBy;
-
-    /**
-     * 角色常量
-     * @deprecated 请使用 {@link UserRoleEnum}
-     */
-    @Deprecated
-    public static final String ROLE_CITY = UserRoleEnum.CITY.getValue();
-    @Deprecated
-    public static final String ROLE_COUNTY = UserRoleEnum.COUNTY.getValue();
 }
