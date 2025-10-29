@@ -2,11 +2,10 @@ package com.wechat.checkin.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -18,33 +17,20 @@ import java.util.Map;
  * @since 1.0.0
  */
 @Slf4j
-public final class JsonUtils {
+public class JsonUtils {
 
-    private JsonUtils() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+    private static ObjectMapper objectMapper;
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    static {
-        // 注册Java 8时间模块
-        OBJECT_MAPPER.registerModule(new JavaTimeModule());
-        
-        // 禁用将日期写为时间戳
-        OBJECT_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        
-        // 忽略未知属性
-        OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        
-        // 忽略空值属性
-        OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    @Autowired
+    public static void setObjectMapper(ObjectMapper mapper) {
+        objectMapper = mapper;
     }
 
     /**
      * 获取ObjectMapper实例
      */
     public static ObjectMapper getObjectMapper() {
-        return OBJECT_MAPPER;
+        return objectMapper;
     }
 
     /**
@@ -55,7 +41,7 @@ public final class JsonUtils {
             return null;
         }
         try {
-            return OBJECT_MAPPER.writeValueAsString(obj);
+            return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             log.error("对象转JSON失败: {}", e.getMessage(), e);
             return null;
@@ -63,14 +49,14 @@ public final class JsonUtils {
     }
 
     /**
-     * 对象转格式化的JSON字符串
+     * 对象转格式化JSON字符串
      */
     public static String toPrettyJson(Object obj) {
         if (obj == null) {
             return null;
         }
         try {
-            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             log.error("对象转格式化JSON失败: {}", e.getMessage(), e);
             return null;
@@ -85,7 +71,7 @@ public final class JsonUtils {
             return null;
         }
         try {
-            return OBJECT_MAPPER.readValue(json, clazz);
+            return objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
             log.error("JSON转对象失败: {}", e.getMessage(), e);
             return null;
@@ -100,7 +86,7 @@ public final class JsonUtils {
             return null;
         }
         try {
-            return OBJECT_MAPPER.readValue(json, typeReference);
+            return objectMapper.readValue(json, typeReference);
         } catch (JsonProcessingException e) {
             log.error("JSON转对象失败: {}", e.getMessage(), e);
             return null;
@@ -115,8 +101,8 @@ public final class JsonUtils {
             return null;
         }
         try {
-            return OBJECT_MAPPER.readValue(json, 
-                OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, clazz));
+            return objectMapper.readValue(json, 
+                objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (JsonProcessingException e) {
             log.error("JSON转List失败: {}", e.getMessage(), e);
             return null;
@@ -131,7 +117,7 @@ public final class JsonUtils {
             return null;
         }
         try {
-            return OBJECT_MAPPER.readValue(json, new TypeReference<Map<String, Object>>() {});
+            return objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
         } catch (JsonProcessingException e) {
             log.error("JSON转Map失败: {}", e.getMessage(), e);
             return null;
@@ -146,8 +132,8 @@ public final class JsonUtils {
             return null;
         }
         try {
-            return OBJECT_MAPPER.readValue(json, 
-                OBJECT_MAPPER.getTypeFactory().constructMapType(Map.class, keyClass, valueClass));
+            return objectMapper.readValue(json, 
+                objectMapper.getTypeFactory().constructMapType(Map.class, keyClass, valueClass));
         } catch (JsonProcessingException e) {
             log.error("JSON转Map失败: {}", e.getMessage(), e);
             return null;
@@ -162,8 +148,8 @@ public final class JsonUtils {
             return null;
         }
         try {
-            return OBJECT_MAPPER.convertValue(obj, new TypeReference<Map<String, Object>>() {});
-        } catch (Exception e) {
+            return objectMapper.convertValue(obj, new TypeReference<Map<String, Object>>() {});
+        } catch (IllegalArgumentException e) {
             log.error("对象转Map失败: {}", e.getMessage(), e);
             return null;
         }
@@ -173,12 +159,12 @@ public final class JsonUtils {
      * Map转对象
      */
     public static <T> T fromMap(Map<String, Object> map, Class<T> clazz) {
-        if (map == null || map.isEmpty()) {
+        if (map == null) {
             return null;
         }
         try {
-            return OBJECT_MAPPER.convertValue(map, clazz);
-        } catch (Exception e) {
+            return objectMapper.convertValue(map, clazz);
+        } catch (IllegalArgumentException e) {
             log.error("Map转对象失败: {}", e.getMessage(), e);
             return null;
         }
@@ -192,8 +178,8 @@ public final class JsonUtils {
             return null;
         }
         try {
-            String json = OBJECT_MAPPER.writeValueAsString(obj);
-            return OBJECT_MAPPER.readValue(json, clazz);
+            String json = objectMapper.writeValueAsString(obj);
+            return objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
             log.error("深拷贝对象失败: {}", e.getMessage(), e);
             return null;
@@ -201,14 +187,14 @@ public final class JsonUtils {
     }
 
     /**
-     * 判断字符串是否为有效的JSON
+     * 验证JSON字符串是否有效
      */
     public static boolean isValidJson(String json) {
         if (json == null || json.trim().isEmpty()) {
             return false;
         }
         try {
-            OBJECT_MAPPER.readTree(json);
+            objectMapper.readTree(json);
             return true;
         } catch (JsonProcessingException e) {
             return false;

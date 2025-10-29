@@ -1,0 +1,49 @@
+# 开发环境配置
+server:
+  port: 8080
+
+spring:
+  # 数据源配置 - 开发环境
+  datasource:
+    url: jdbc:mysql://localhost:3306/we_chat_checkin_dev?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+  
+  # SQL初始化配置
+  sql:
+    init:
+      mode: never  # 禁用SQL初始化
+
+# JWT配置 - 开发环境（较短过期时间便于测试）
+jwt:
+  secret: wechat-checkin-dev-jwt-secret-key-2024
+  access-token-expiration: 3600000  # 1小时
+  refresh-token-expiration: 86400000  # 1天
+
+# 日志配置 - 开发环境
+logging:
+  level:
+    com.wechat.checkin: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.mybatis: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+    org.springdoc: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# MyBatis Plus配置 - 开发环境
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 跨域配置 - 开发环境
+cors:
+  allowed-origins: 
+    - http://localhost:3000
+    - http://localhost:8080
+    - http://127.0.0.1:3000
+    - http://127.0.0.1:8080
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true

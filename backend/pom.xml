@@ -16,6 +16,7 @@
     <modules>
         <module>we-chat-common</module>
         <module>we-chat-auth</module>
+        <module>we-chat-web</module>
     </modules>
 
     <!-- 属性配置 -->
@@ -31,6 +32,7 @@
         
         <!-- 数据库相关 -->
         <mybatis-plus.version>3.5.14</mybatis-plus.version>
+        <mybatis.version>3.0.5</mybatis.version>
         <mysql.version>8.0.33</mysql.version>
         
         <!-- 工具库版本 -->
@@ -40,9 +42,9 @@
         <jwt.version>0.12.6</jwt.version>
         <zxing.version>3.5.2</zxing.version>
         
-        <!-- 文档工具版本 -->
-        <springdoc.version>2.2.0</springdoc.version>
-        <knife4j.version>4.3.0</knife4j.version>
+            <!-- 文档工具版本 -->
+        <springdoc.version>2.8.8</springdoc.version>
+        <knife4j.version>4.4.0</knife4j.version>
         
         <!-- Maven插件版本 -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -61,15 +63,17 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Mybatis Spring Boot Starter -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+
             <!-- MyBatis Plus -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-generator</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
@@ -115,23 +119,25 @@
             </dependency>
 
             <!-- 二维码 -->
-            <dependency>
-                <groupId>com.google.zxing</groupId>
-                <artifactId>core</artifactId>
-                <version>${zxing.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.zxing</groupId>
-                <artifactId>javase</artifactId>
-                <version>${zxing.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.google.zxing</groupId>-->
+<!--                <artifactId>core</artifactId>-->
+<!--                <version>${zxing.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.google.zxing</groupId>-->
+<!--                <artifactId>javase</artifactId>-->
+<!--                <version>${zxing.version}</version>-->
+<!--            </dependency>-->
 
             <!-- API文档 -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                <version>${springdoc.version}</version>
+<!--                <version>${springdoc.version}</version>-->
+                <version>2.8.8</version>
             </dependency>
+
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
@@ -149,41 +155,41 @@
                 <artifactId>we-chat-auth</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.wechat.checkin</groupId>
-                <artifactId>we-chat-activity</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wechat.checkin</groupId>
-                <artifactId>we-chat-qrcode</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wechat.checkin</groupId>
-                <artifactId>we-chat-checkins</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wechat.checkin</groupId>
-                <artifactId>we-chat-evaluation</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wechat.checkin</groupId>
-                <artifactId>we-chat-dashboard</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wechat.checkin</groupId>
-                <artifactId>we-chat-admin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wechat.checkin</groupId>
-                <artifactId>we-chat-audit</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.wechat.checkin</groupId>-->
+<!--                <artifactId>we-chat-activity</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.wechat.checkin</groupId>-->
+<!--                <artifactId>we-chat-qrcode</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.wechat.checkin</groupId>-->
+<!--                <artifactId>we-chat-checkins</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.wechat.checkin</groupId>-->
+<!--                <artifactId>we-chat-evaluation</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.wechat.checkin</groupId>-->
+<!--                <artifactId>we-chat-dashboard</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.wechat.checkin</groupId>-->
+<!--                <artifactId>we-chat-admin</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.wechat.checkin</groupId>-->
+<!--                <artifactId>we-chat-audit</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
