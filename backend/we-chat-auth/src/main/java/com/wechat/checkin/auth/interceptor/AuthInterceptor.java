@@ -7,7 +7,6 @@ import com.wechat.checkin.auth.security.JwtTokenProvider;
 import com.wechat.checkin.auth.security.UserPrincipal;
 import com.wechat.checkin.common.enums.StatusEnum;
 import com.wechat.checkin.common.exception.BusinessException;
-import com.wechat.checkin.common.response.Result;
 import com.wechat.checkin.common.response.ResultCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

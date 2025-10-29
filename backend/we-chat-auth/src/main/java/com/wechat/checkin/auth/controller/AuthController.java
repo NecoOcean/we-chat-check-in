@@ -3,15 +3,12 @@ package com.wechat.checkin.auth.controller;
 import com.wechat.checkin.auth.dto.LoginRequest;
 import com.wechat.checkin.auth.service.AuthService;
 import com.wechat.checkin.auth.vo.LoginResponse;
-import com.wechat.checkin.common.annotation.AuditLog;
-import com.wechat.checkin.common.constant.BusinessConstants;
 import com.wechat.checkin.common.response.Result;
 import com.wechat.checkin.common.util.IpUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,17 +40,8 @@ public class AuthController {
      * @return 登录响应
      */
     @PostMapping("/login")
-    @Operation(summary = "用户登录", description = "管理员用户登录，返回JWT访问令牌和刷新令牌")
-    @AuditLog(
-        value = "用户登录",
-        operationType = BusinessConstants.OperationType.LOGIN,
-        module = BusinessConstants.BusinessModule.AUTH,
-        recordParams = true,
-        recordResult = false
-    )
-    public Result<LoginResponse> login(
-            @Valid @RequestBody LoginRequest loginRequest,
-            HttpServletRequest request) {
+    @Operation(summary = "管理员登录", description = "市级或县级管理员使用用户名和密码登录")
+    public Result<LoginResponse> login(@Validated @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         
         String clientIp = IpUtils.getClientIp(request);
         LoginResponse response = authService.login(loginRequest, clientIp);
@@ -86,14 +74,7 @@ public class AuthController {
      * @return 操作结果
      */
     @PostMapping("/logout")
-    @Operation(summary = "用户登出", description = "用户登出，使当前访问令牌失效")
-    @AuditLog(
-        value = "用户登出",
-        operationType = BusinessConstants.OperationType.LOGOUT,
-        module = BusinessConstants.BusinessModule.AUTH,
-        recordParams = false,
-        recordResult = false
-    )
+    @Operation(summary = "管理员登出", description = "销毁当前会话，令牌失效")
     public Result<Void> logout(HttpServletRequest request) {
         
         String authHeader = request.getHeader("Authorization");

@@ -4,6 +4,7 @@ import com.wechat.checkin.auth.annotation.RequireDataPermission;
 import com.wechat.checkin.auth.security.JwtTokenProvider;
 import com.wechat.checkin.common.constant.CommonConstants;
 import com.wechat.checkin.common.exception.BusinessException;
+import com.wechat.checkin.common.response.ResultCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -45,12 +46,12 @@ public class DataPermissionInterceptor implements HandlerInterceptor {
         // 获取JWT令牌
         String token = extractToken(request);
         if (token == null) {
-            throw new BusinessException("未找到访问令牌");
+            throw new BusinessException(ResultCode.TOKEN_MISSING);
         }
 
         // 验证令牌并获取用户信息
         if (!jwtTokenProvider.validateToken(token)) {
-            throw new BusinessException("访问令牌无效");
+            throw new BusinessException(ResultCode.TOKEN_INVALID);
         }
 
         String userId = String.valueOf(jwtTokenProvider.getUserIdFromToken(token));
@@ -65,7 +66,7 @@ public class DataPermissionInterceptor implements HandlerInterceptor {
         if (CommonConstants.UserRole.COUNTY_ADMIN.equals(userRole)) {
             String countyCode = jwtTokenProvider.getCountyCodeFromToken(token);
             if (countyCode == null) {
-                throw new BusinessException("县级管理员缺少县域信息");
+                throw new BusinessException(ResultCode.BUSINESS_ERROR, "县级管理员缺少县域信息");
             }
             
             // 将县域代码设置到请求属性中，供后续业务逻辑使用
@@ -74,7 +75,7 @@ public class DataPermissionInterceptor implements HandlerInterceptor {
         }
         
         // 普通用户不允许访问需要数据权限的接口
-        throw new BusinessException("权限不足，无法访问该资源");
+        throw new BusinessException(ResultCode.PERMISSION_DENIED);
     }
 
     /**
@@ -87,4 +88,6 @@ public class DataPermissionInterceptor implements HandlerInterceptor {
         }
         return null;
     }
+
+
 }

@@ -6,6 +6,11 @@ import cn.hutool.core.util.IdUtil;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.wechat.checkin.common.exception.BusinessException;
+import com.wechat.checkin.common.response.ResultCode;
+
+import java.security.SecureRandom;
+
 /**
  * ID生成工具类
  * 提供各种ID生成方法
@@ -60,7 +65,7 @@ public class IdUtils {
      */
     public static String randomNumericId(int length) {
         if (length <= 0) {
-            throw new IllegalArgumentException("Length must be positive");
+            throw new BusinessException(ResultCode.PARAM_ERROR, "Length must be positive");
         }
         
         StringBuilder sb = new StringBuilder(length);
@@ -82,7 +87,7 @@ public class IdUtils {
      */
     public static String randomAlphaNumericId(int length) {
         if (length <= 0) {
-            throw new IllegalArgumentException("Length must be positive");
+            throw new BusinessException(ResultCode.PARAM_ERROR, "Length must be positive");
         }
         
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

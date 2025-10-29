@@ -24,7 +24,7 @@ public interface AdminMapper extends BaseMapper<Admin> {
      * @param username 用户名
      * @return 管理员信息
      */
-    @Select("SELECT * FROM admins WHERE username = #{username} AND deleted = 0")
+    @Select("SELECT * FROM admins WHERE username = #{username}")
     Admin findByUsername(@Param("username") String username);
 
     /**
@@ -46,16 +46,16 @@ public interface AdminMapper extends BaseMapper<Admin> {
      * @param username 用户名
      * @return 存在数量
      */
-    @Select("SELECT COUNT(*) FROM admins WHERE username = #{username} AND deleted = 0")
+    @Select("SELECT COUNT(*) FROM admins WHERE username = #{username}")
     int countByUsername(@Param("username") String username);
 
     /**
-     * 检查县域代码下的管理员数量
+     * 根据县级代码计算管理员数量
      *
-     * @param countyCode 县域代码
-     * @return 管理员数量
+     * @param countyCode 县级代码
+     * @return 匹配的管理员数量
      */
-    @Select("SELECT COUNT(*) FROM admins WHERE county_code = #{countyCode} AND deleted = 0")
+    @Select("SELECT COUNT(*) FROM admins WHERE county_code = #{countyCode}")
     int countByCountyCode(@Param("countyCode") String countyCode);
 
     /**

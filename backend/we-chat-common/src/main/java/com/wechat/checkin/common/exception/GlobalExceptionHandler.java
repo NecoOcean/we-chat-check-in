@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleBusinessException(BusinessException e, HttpServletRequest request) {
-        log.warn("业务异常: {} - {}", e.getCode(), e.getMessage(), e);
+        log.warn("业务异常: {} - {}", e.getCode(), e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
     }
 
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SystemException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleSystemException(SystemException e, HttpServletRequest request) {
-        log.error("系统异常: {} - {}", e.getCode(), e.getMessage(), e);
+        log.error("系统异常: {} - {}", e.getCode(), e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
     }
 
