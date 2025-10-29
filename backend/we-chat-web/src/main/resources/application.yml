@@ -64,11 +64,14 @@ jwt:
 # 日志配置
 logging:
   level:
-    com.wechat.checkin: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
+    root: INFO
+    com.wechat.checkin: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.springframework.security.web.FilterChainProxy: ERROR
+    org.springframework.security.authentication: WARN
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 # 管理端点配置
 management:

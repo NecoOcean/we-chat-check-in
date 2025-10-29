@@ -116,3 +116,5 @@ yarn-error.log*
 # Docker
 .dockerignore
 Dockerfile.local
+
+.xcodemap

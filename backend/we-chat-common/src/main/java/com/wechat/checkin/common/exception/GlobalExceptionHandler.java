@@ -40,8 +40,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleBusinessException(BusinessException e, HttpServletRequest request) {
-        log.warn("业务异常: {} - {}", e.getCode(), e.getMessage());
+        // 对于常见的业务异常（如用户不存在、密码错误等），使用INFO级别记录
+        if (isCommonBusinessError(e.getCode())) {
+            log.info("业务异常: {} - {}", e.getCode(), e.getMessage());
+        } else {
+            log.warn("业务异常: {} - {}", e.getCode(), e.getMessage());
+        }
         return Result.error(e.getCode(), e.getMessage());
+    }
+
+    /**
+     * 判断是否为常见的业务错误（不需要详细日志记录）
+     */
+    private boolean isCommonBusinessError(Integer code) {
+        return ResultCode.USER_NOT_FOUND.getCode().equals(code) ||
+               ResultCode.PASSWORD_ERROR.getCode().equals(code) ||
+               ResultCode.USER_DISABLED.getCode().equals(code) ||
+               ResultCode.TOKEN_INVALID.getCode().equals(code) ||
+               ResultCode.TOKEN_EXPIRED.getCode().equals(code) ||
+               ResultCode.UNAUTHORIZED.getCode().equals(code);
     }
 
     /**
