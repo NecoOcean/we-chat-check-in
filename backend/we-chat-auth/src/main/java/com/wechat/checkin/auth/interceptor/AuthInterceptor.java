@@ -6,6 +6,8 @@ import com.wechat.checkin.auth.entity.Admin;
 import com.wechat.checkin.auth.security.JwtTokenProvider;
 import com.wechat.checkin.auth.security.UserPrincipal;
 import com.wechat.checkin.common.enums.StatusEnum;
+import com.wechat.checkin.common.enums.UserRoleEnum;
+import com.wechat.checkin.common.enums.PermissionTypeEnum;
 import com.wechat.checkin.common.exception.BusinessException;
 import com.wechat.checkin.common.response.ResultCode;
 import jakarta.servlet.http.HttpServletRequest;
@@ -156,7 +158,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             
             // 这里可以扩展权限检查逻辑
             // 目前简单检查：市级管理员拥有所有权限，县级管理员只能访问县级权限
-            if (Admin.ROLE_COUNTY.equals(userPrincipal.getRole())) {
+            if (UserRoleEnum.COUNTY.getValue().equals(userPrincipal.getRole())) {
                 // 县级管理员权限检查
                 if (!isCountyPermission(permissionCode)) {
                     throw new BusinessException(ResultCode.FORBIDDEN, 
@@ -175,7 +177,7 @@ public class AuthInterceptor implements HandlerInterceptor {
      * 检查县级权限
      */
     private void checkCountyPermission(UserPrincipal userPrincipal) {
-        if (Admin.ROLE_COUNTY.equals(userPrincipal.getRole())) {
+        if (UserRoleEnum.COUNTY.getValue().equals(userPrincipal.getRole())) {
             String countyCode = userPrincipal.getCountyCode();
             if (countyCode == null || countyCode.trim().isEmpty()) {
                 throw new BusinessException(ResultCode.FORBIDDEN, "县级管理员缺少县区代码");
@@ -187,10 +189,8 @@ public class AuthInterceptor implements HandlerInterceptor {
      * 判断是否为县级权限
      */
     private boolean isCountyPermission(String permissionCode) {
-        // 简单的权限判断逻辑，可以根据实际需求扩展
-        return permissionCode.contains("county") || 
-               permissionCode.contains("checkin") || 
-               permissionCode.contains("activity");
+        // 使用枚举替代硬编码字符串，提高代码可维护性
+        return PermissionTypeEnum.isCountyRelated(permissionCode);
     }
 
     /**

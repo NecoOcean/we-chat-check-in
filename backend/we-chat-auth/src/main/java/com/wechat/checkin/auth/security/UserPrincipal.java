@@ -2,6 +2,7 @@ package com.wechat.checkin.auth.security;
 
 import com.wechat.checkin.auth.entity.Admin;
 import com.wechat.checkin.common.enums.StatusEnum;
+import com.wechat.checkin.common.enums.UserRoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -126,7 +127,7 @@ public class UserPrincipal implements UserDetails {
      * @return 是否为市级管理员
      */
     public boolean isCityAdmin() {
-        return Admin.ROLE_CITY.equals(role);
+        return UserRoleEnum.CITY.getValue().equals(role);
     }
 
     /**
@@ -135,6 +136,6 @@ public class UserPrincipal implements UserDetails {
      * @return 是否为县级管理员
      */
     public boolean isCountyAdmin() {
-        return Admin.ROLE_COUNTY.equals(role);
+        return UserRoleEnum.COUNTY.getValue().equals(role);
     }
 }

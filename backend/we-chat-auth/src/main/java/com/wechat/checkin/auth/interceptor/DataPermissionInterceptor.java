@@ -3,6 +3,7 @@ package com.wechat.checkin.auth.interceptor;
 import com.wechat.checkin.auth.annotation.RequireDataPermission;
 import com.wechat.checkin.auth.security.JwtTokenProvider;
 import com.wechat.checkin.common.constant.CommonConstants;
+import com.wechat.checkin.common.enums.UserRoleEnum;
 import com.wechat.checkin.common.exception.BusinessException;
 import com.wechat.checkin.common.response.ResultCode;
 import lombok.RequiredArgsConstructor;
@@ -58,12 +59,12 @@ public class DataPermissionInterceptor implements HandlerInterceptor {
         String userRole = jwtTokenProvider.getRoleFromToken(token);
         
         // 如果是市级管理员，可以访问所有数据
-        if (CommonConstants.UserRole.CITY_ADMIN.equals(userRole)) {
+        if (UserRoleEnum.CITY.getValue().equals(userRole)) {
             return true;
         }
         
         // 如果是县级管理员，需要验证数据权限
-        if (CommonConstants.UserRole.COUNTY_ADMIN.equals(userRole)) {
+        if (UserRoleEnum.COUNTY.getValue().equals(userRole)) {
             String countyCode = jwtTokenProvider.getCountyCodeFromToken(token);
             if (countyCode == null) {
                 throw new BusinessException(ResultCode.BUSINESS_ERROR, "县级管理员缺少县域信息");

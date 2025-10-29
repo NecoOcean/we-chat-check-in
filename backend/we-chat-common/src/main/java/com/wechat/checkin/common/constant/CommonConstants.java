@@ -1,5 +1,7 @@
 package com.wechat.checkin.common.constant;
 
+import com.wechat.checkin.common.enums.UserRoleEnum;
+
 /**
  * 通用常量类
  *
@@ -211,15 +213,17 @@ public final class CommonConstants {
     // ==================== 用户角色常量 ====================
 
     /**
-     * 用户角色常量
+     * 用户角色常量 - 使用UserRoleEnum
+     * @deprecated 请使用 {@link UserRoleEnum}
      */
+    @Deprecated
     public static class UserRole {
         /** 市级管理员 */
-        public static final String CITY_ADMIN = "CITY_ADMIN";
+        public static final String CITY_ADMIN = UserRoleEnum.CITY.getValue();
         /** 县级管理员 */
-        public static final String COUNTY_ADMIN = "COUNTY_ADMIN";
+        public static final String COUNTY_ADMIN = UserRoleEnum.COUNTY.getValue();
         /** 普通用户 */
-        public static final String USER = "USER";
+        public static final String USER = UserRoleEnum.USER.getValue();
     }
 
     // ==================== 请求属性常量 ====================

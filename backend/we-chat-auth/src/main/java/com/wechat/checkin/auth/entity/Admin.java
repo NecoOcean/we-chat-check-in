@@ -3,6 +3,7 @@ package com.wechat.checkin.auth.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.wechat.checkin.common.enums.DeletedEnum;
 import com.wechat.checkin.common.enums.StatusEnum;
+import com.wechat.checkin.common.enums.UserRoleEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -99,7 +100,12 @@ public class Admin {
     @TableField("updated_by")
     private Long updatedBy;
 
-    // 角色常量
-    public static final String ROLE_CITY = "city";
-    public static final String ROLE_COUNTY = "county";
+    /**
+     * 角色常量
+     * @deprecated 请使用 {@link UserRoleEnum}
+     */
+    @Deprecated
+    public static final String ROLE_CITY = UserRoleEnum.CITY.getValue();
+    @Deprecated
+    public static final String ROLE_COUNTY = UserRoleEnum.COUNTY.getValue();
 }

@@ -16,17 +16,22 @@ public enum StatusEnum {
     /**
      * 启用
      */
-    ENABLED(1, "启用"),
+    ENABLED("enabled", "启用"),
 
     /**
      * 禁用
      */
-    DISABLED(0, "禁用");
+    DISABLED("disabled", "禁用"),
 
     /**
-     * 状态码
+     * 已删除
      */
-    private final Integer code;
+    DELETED("deleted", "已删除");
+
+    /**
+     * 状态值（对应数据库中的enum值）
+     */
+    private final String value;
 
     /**
      * 状态描述
@@ -34,14 +39,14 @@ public enum StatusEnum {
     private final String description;
 
     /**
-     * 根据状态码获取枚举
+     * 根据状态值获取枚举
      */
-    public static StatusEnum getByCode(Integer code) {
-        if (code == null) {
+    public static StatusEnum getByValue(String value) {
+        if (value == null) {
             return null;
         }
         for (StatusEnum status : values()) {
-            if (status.getCode().equals(code)) {
+            if (status.getValue().equals(value)) {
                 return status;
             }
         }
@@ -49,16 +54,66 @@ public enum StatusEnum {
     }
 
     /**
+     * 根据状态码获取枚举（兼容旧版本）
+     */
+    public static StatusEnum getByCode(Integer code) {
+        if (code == null) {
+            return null;
+        }
+        if (code == 1) {
+            return ENABLED;
+        } else if (code == 0) {
+            return DISABLED;
+        }
+        return null;
+    }
+
+    /**
+     * 获取状态码（兼容旧版本）
+     */
+    public Integer getCode() {
+        return ENABLED.equals(this) ? 1 : 0;
+    }
+
+    /**
      * 判断是否启用
      */
+    public static boolean isEnabled(String value) {
+        return ENABLED.getValue().equals(value);
+    }
+
+    /**
+     * 判断是否启用（兼容旧版本）
+     */
     public static boolean isEnabled(Integer code) {
-        return ENABLED.getCode().equals(code);
+        return Integer.valueOf(1).equals(code);
     }
 
     /**
      * 判断是否禁用
      */
+    public static boolean isDisabled(String value) {
+        return DISABLED.getValue().equals(value);
+    }
+
+    /**
+     * 判断是否禁用（兼容旧版本）
+     */
     public static boolean isDisabled(Integer code) {
-        return DISABLED.getCode().equals(code);
+        return Integer.valueOf(0).equals(code);
+    }
+
+    /**
+     * 判断是否已删除
+     */
+    public static boolean isDeleted(String value) {
+        return DELETED.getValue().equals(value);
+    }
+
+    /**
+     * 判断是否有效状态（非删除状态）
+     */
+    public static boolean isValid(String value) {
+        return !isDeleted(value);
     }
 }
