@@ -14,7 +14,7 @@
     <artifactId>we-chat-common</artifactId>
     <packaging>jar</packaging>
     <name>WeChat Check-in Common Module</name>
-    <description>Common utilities, constants, exceptions and response wrappers</description>
+    <description>公共模块，包含公共的工具类、常量、异常和响应包装器</description>
 
     <dependencies>
         <!-- Spring Boot Starter -->
@@ -65,20 +65,10 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Mybatis Spring Boot Starter -->
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-        </dependency>
-
         <!-- MyBatis Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-jsqlparser</artifactId>
         </dependency>
 
         <!-- 数据库相关 -->
@@ -106,14 +96,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <!-- Maven编译插件 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

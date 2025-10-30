@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.wechat.checkin</groupId>
+    <artifactId>we-chat-check-in</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <groupId>com.wechat.checkin</groupId>
+  <artifactId>we-chat-qrcode</artifactId>
+  <version>1.0.0</version>
+  <name>WeChat Check-in QR Code Module</name>
+  <description>二维码管理模块</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.wechat.checkin</groupId>
+      <artifactId>we-chat-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>javase</artifactId>
+    </dependency>
+  </dependencies>
+</project>

@@ -21,17 +21,14 @@
         <dependency>
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-auth</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-activity</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Spring Boot Starter -->
@@ -105,11 +102,17 @@
     </dependencies>
 
     <build>
+        <!-- 资源文件配置 -->
+        <!-- 指定Maven构建过程中需要包含的资源文件 -->
         <resources>
             <resource>
+                <!-- 资源文件目录 -->
                 <directory>src/main/resources</directory>
+                <!-- 包含的文件类型过滤 -->
                 <includes>
+                    <!-- 包含所有.yml配置文件（Spring Boot配置文件） -->
                     <include>**/*.yml</include>
+                    <!-- 包含所有.xml配置文件（如MyBatis映射文件等） -->
                     <include>**/*.xml</include>
                 </includes>
             </resource>

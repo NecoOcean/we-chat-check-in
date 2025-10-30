@@ -14,14 +14,13 @@
     <artifactId>we-chat-auth</artifactId>
     <packaging>jar</packaging>
     <name>WeChat Check-in Auth Module</name>
-    <description>Authentication and authorization module with JWT token management</description>
+    <description>认证模块，包含用户认证、授权和JWT令牌管理</description>
 
     <dependencies>
         <!-- 依赖公共模块 -->
         <dependency>
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Spring Boot Starter -->
@@ -129,14 +128,4 @@
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <!-- Maven编译插件 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

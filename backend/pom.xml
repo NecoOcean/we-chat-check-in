@@ -10,200 +10,89 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>WeChat Check-in System</name>
-    <description>WeChat Mini Program Check-in System Backend</description>
+    <description>微信小程序签到系统后端模块，包含用户认证、活动管理、签到记录管理等功能</description>
 
-    <!-- 子模块 - 将在创建子模块时逐步添加 -->
+    <!-- 子模块 -->
     <modules>
+        <module>we-chat-dependencies</module>
         <module>we-chat-common</module>
         <module>we-chat-auth</module>
         <module>we-chat-activity</module>
         <module>we-chat-web</module>
+        <module>we-chat-qrcode</module>
     </modules>
 
     <!-- 属性配置 -->
+    <!-- 集中管理项目所有公共属性和版本信息，所有子模块可继承使用 -->
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>17</java.version>
+        <!-- 编译环境配置 -->
+        <maven.compiler.source>17</maven.compiler.source>  <!-- 源代码兼容性版本：指定使用Java 17语法 -->
+        <maven.compiler.target>17</maven.compiler.target>  <!-- 目标JVM版本：生成兼容Java 17的字节码 -->
         
-        <!-- Spring Boot版本 -->
-        <spring-boot.version>3.5.7</spring-boot.version>
+        <!-- 编码设置 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  <!-- 项目源码编码格式 -->
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  <!-- 项目报告输出编码格式 -->
         
-        <!-- 数据库相关 -->
-        <mybatis-plus.version>3.5.14</mybatis-plus.version>
-        <mybatis.version>3.0.5</mybatis.version>
-        <mysql.version>8.0.33</mysql.version>
+        <!-- Java环境版本 -->
+        <java.version>17</java.version>  <!-- 项目使用的Java运行环境版本 -->
         
-        <!-- 工具库版本 -->
-        <hutool.version>5.8.22</hutool.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <lombok.version>1.18.30</lombok.version>
-        <jwt.version>0.12.6</jwt.version>
-        <zxing.version>3.5.2</zxing.version>
-        
-            <!-- 文档工具版本 -->
-        <springdoc.version>2.8.8</springdoc.version>
-        <knife4j.version>4.4.0</knife4j.version>
-        
+        <!-- 项目版本控制 -->
+        <revision>1.0.0</revision>  <!-- 项目主版本号，通过变量统一管理便于升级 -->
+        <spring-boot.version>3.5.7</spring-boot.version>  <!-- Spring Boot框架版本 -->
+    
         <!-- Maven插件版本 -->
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
+        <!-- 集中管理各构建插件版本，确保构建过程的一致性和稳定性 -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>  <!-- Java编译插件版本 -->
+        <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>  <!-- 单元测试执行插件版本 -->
+        <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>  <!-- POM扁平化插件版本，用于简化多模块构建 -->
+        <lombok.version>1.18.30</lombok.version>  <!-- Lombok插件版本，用于简化Java样板代码 -->
+        <mapstruct.version>1.5.5.Final</mapstruct.version>  <!-- MapStruct插件版本，用于对象映射 -->
     </properties>
 
     <!-- 依赖管理 -->
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Boot BOM -->
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
+                <groupId>com.wechat.checkin</groupId>
+                <artifactId>we-chat-dependencies</artifactId>
+                <version>${revision}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- Mybatis Spring Boot Starter -->
-            <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis.version}</version>
-            </dependency>
-
-            <!-- MyBatis Plus -->
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-jsqlparser</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
-
-            <!-- 数据库驱动 -->
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.version}</version>
-            </dependency>
-
-            <!-- 工具库 -->
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct</artifactId>
-                <version>${mapstruct.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-processor</artifactId>
-                <version>${mapstruct.version}</version>
-            </dependency>
-
-            <!-- JWT -->
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-api</artifactId>
-                <version>${jwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-impl</artifactId>
-                <version>${jwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-jackson</artifactId>
-                <version>${jwt.version}</version>
-            </dependency>
-
-            <!-- 二维码 -->
-<!--            <dependency>-->
-<!--                <groupId>com.google.zxing</groupId>-->
-<!--                <artifactId>core</artifactId>-->
-<!--                <version>${zxing.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.google.zxing</groupId>-->
-<!--                <artifactId>javase</artifactId>-->
-<!--                <version>${zxing.version}</version>-->
-<!--            </dependency>-->
-
-            <!-- API文档 -->
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-               <version>${springdoc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-                <version>${knife4j.version}</version>
             </dependency>
 
             <!-- 内部模块依赖 -->
             <dependency>
                 <groupId>com.wechat.checkin</groupId>
                 <artifactId>we-chat-common</artifactId>
-                <version>${project.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.wechat.checkin</groupId>
                 <artifactId>we-chat-auth</artifactId>
-                <version>${project.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.wechat.checkin</groupId>
                 <artifactId>we-chat-activity</artifactId>
-                <version>${project.version}</version>
+                <version>${revision}</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.wechat.checkin</groupId>-->
-<!--                <artifactId>we-chat-activity</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.wechat.checkin</groupId>-->
-<!--                <artifactId>we-chat-qrcode</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.wechat.checkin</groupId>-->
-<!--                <artifactId>we-chat-checkins</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.wechat.checkin</groupId>-->
-<!--                <artifactId>we-chat-evaluation</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.wechat.checkin</groupId>-->
-<!--                <artifactId>we-chat-dashboard</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.wechat.checkin</groupId>-->
-<!--                <artifactId>we-chat-admin</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.wechat.checkin</groupId>-->
-<!--                <artifactId>we-chat-audit</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
+           <dependency>
+               <groupId>com.wechat.checkin</groupId>
+               <artifactId>we-chat-qrcode</artifactId>
+               <version>${revision}</version>
+           </dependency>
         </dependencies>
     </dependencyManagement>
 
     <!-- 构建配置 -->
     <build>
+        <plugins>
+            <!-- 扁平化插件 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <!-- Spring Boot Maven插件 -->
@@ -251,6 +140,33 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+
+                <!-- 扁平化插件 -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${flatten-maven-plugin.version}</version>
+                    <configuration>
+                        <updatePomFile>true</updatePomFile>
+                        <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>flatten.clean</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
