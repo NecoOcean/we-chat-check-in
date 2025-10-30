@@ -30,7 +30,7 @@ public interface ActivityService {
      * @param countyCode 管理员县域编码
      * @return 活动列表
      */
-    PageResult<ActivityVO> listActivities(ActivityQueryRequest request, String adminRole, String countyCode);
+    PageResult<ActivityVO> listActivities(ActivityQueryRequest request, Long adminId, String adminRole, String countyCode);
 
     /**
      * 查询活动详情

@@ -1,5 +1,8 @@
 package com.wechat.checkin.activity.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wechat.checkin.activity.dto.ActivityQueryRequest;
 import com.wechat.checkin.activity.dto.CreateActivityRequest;
 import com.wechat.checkin.activity.entity.Activity;
@@ -40,7 +43,7 @@ public class ActivityServiceImpl implements ActivityService {
         // 参数校验
         validateCreateRequest(request, adminRole, countyCode);
 
-        // 构建活动实体
+        // 构建活动实体（createdTime和updatedTime由MetaObjectHandler自动填充）
         Activity activity = Activity.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -49,11 +52,9 @@ public class ActivityServiceImpl implements ActivityService {
                 .endTime(request.getEndTime())
                 .createdId(adminId)
                 .status(ActivityStatusEnum.ONGOING)
-                .createdTime(LocalDateTime.now())
-                .updatedTime(LocalDateTime.now())
                 .build();
 
-        // 插入数据库
+        // 插入数据库（使用MyBatis Plus的insert方法）
         activityMapper.insert(activity);
 
         log.info("活动创建成功，活动ID: {}, 创建人: {}, 角色: {}, 县域: {}", 
@@ -63,30 +64,31 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public PageResult<ActivityVO> listActivities(ActivityQueryRequest request, String adminRole, String countyCode) {
-        // 权限过滤：县级管理员只能查看本县活动
+    public PageResult<ActivityVO> listActivities(ActivityQueryRequest request, Long adminId, String adminRole, String countyCode) {
+        log.info("查询活动列表，操作员ID: {}, 操作员Role: {}, 县域: {}", adminId, adminRole, countyCode);
+        
+        // 权限过滤：县级管理员只能查看本区活动
         String filterCountyCode = "county".equals(adminRole) ? countyCode : request.getCountyCode();
 
-        // 计算分页参数
-        int offset = (request.getPage() - 1) * request.getSize();
+        // 构建查询条件（使用LambdaQueryWrapper）
+        LambdaQueryWrapper<Activity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StringUtils.isNotEmpty(request.getStatus()), Activity::getStatus, request.getStatus())
+               .and(StringUtils.isNotEmpty(filterCountyCode), w -> 
+                   w.eq(Activity::getScopeCountyCode, filterCountyCode)
+                    .or()
+                    .isNull(Activity::getScopeCountyCode))  // 全市活动（scopeCountyCode为null）对县级可见
+               .orderByDesc(Activity::getCreatedTime);
 
-        // 查询活动列表
-        List<Activity> activities = activityMapper.selectList(
-                request.getStatus(),
-                filterCountyCode,
-                offset,
-                request.getSize()
-        );
-
-        // 查询总数
-        long total = activityMapper.count(request.getStatus(), filterCountyCode);
+        // 使用MyBatis Plus的Page对象进行分页查询
+        Page<Activity> page = new Page<>(request.getPage(), request.getSize());
+        Page<Activity> result = activityMapper.selectPage(page, wrapper);
 
         // 转换为VO
-        List<ActivityVO> voList = activities.stream()
+        List<ActivityVO> voList = result.getRecords().stream()
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
 
-        return PageResult.success((long) request.getPage(), (long) request.getSize(), total, voList);
+        return PageResult.success((long) request.getPage(), (long) request.getSize(), result.getTotal(), voList);
     }
 
     @Override
@@ -131,8 +133,12 @@ public class ActivityServiceImpl implements ActivityService {
             throw new BusinessException(ResultCode.BUSINESS_ERROR, "活动已结束，无需重复操作");
         }
 
-        // 更新活动状态
-        activityMapper.updateStatus(activityId, ActivityStatusEnum.ENDED.getValue(), LocalDateTime.now());
+        // 使用LambdaUpdateWrapper更新活动状态（updatedTime由MetaObjectHandler自动填充）
+        LambdaUpdateWrapper<Activity> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Activity::getId, activityId)
+                    .set(Activity::getStatus, ActivityStatusEnum.ENDED)
+                    .set(Activity::getEndedTime, LocalDateTime.now());
+        activityMapper.update(null, updateWrapper);
 
         log.info("活动结束成功，活动ID: {}, 操作人: {}", activityId, adminId);
     }

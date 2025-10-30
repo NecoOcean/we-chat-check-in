@@ -54,6 +54,7 @@ public class ActivityController {
 
         PageResult<ActivityVO> result = activityService.listActivities(
                 request,
+                principal.getId(),
                 principal.getRole(),
                 principal.getCountyCode()
         );
@@ -65,11 +66,11 @@ public class ActivityController {
     @GetMapping("/{id}")
     @RequireRole({"city", "county"})
     public Result<ActivityDetailVO> getActivityDetail(
-            @Parameter(description = "活动ID") @PathVariable Long id,
+            @Parameter(description = "活动ID") @PathVariable("id") Long activityId,
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal) {
 
         ActivityDetailVO detail = activityService.getActivityDetail(
-                id,
+                activityId,
                 principal.getRole(),
                 principal.getCountyCode()
         );
@@ -81,11 +82,11 @@ public class ActivityController {
     @PostMapping("/{id}/finish")
     @RequireRole({"city", "county"})
     public Result<Void> finishActivity(
-            @Parameter(description = "活动ID") @PathVariable Long id,
+            @Parameter(description = "活动ID") @PathVariable("id") Long activityId,
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal) {
 
         activityService.finishActivity(
-                id,
+                activityId,
                 principal.getId(),
                 principal.getRole(),
                 principal.getCountyCode()

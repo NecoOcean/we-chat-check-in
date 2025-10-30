@@ -1,5 +1,6 @@
 package com.wechat.checkin.auth.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wechat.checkin.auth.dto.LoginRequest;
 import com.wechat.checkin.auth.entity.Admin;
 import com.wechat.checkin.auth.mapper.AdminMapper;
@@ -35,8 +36,12 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginRequest loginRequest, String clientIp) {
         log.info("用户登录尝试: username={}, ip={}", loginRequest.getUsername(), clientIp);
 
-        // 1. 查找用户
-        Admin admin = adminMapper.findByUsername(loginRequest.getUsername());// 检查用户是否存在
+        // 1. 使用LambdaQueryWrapper查找用户
+        LambdaQueryWrapper<Admin> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Admin::getUsername, loginRequest.getUsername());
+        Admin admin = adminMapper.selectOne(wrapper);
+        
+        // 检查用户是否存在
         if (admin == null) {
             log.warn("登录失败: 用户不存在, username={}", loginRequest.getUsername());
             throw new BusinessException(ResultCode.USER_NOT_FOUND, "用户名或密码错误");

@@ -4,13 +4,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wechat.checkin.auth.entity.Admin;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 
 /**
  * 管理员Mapper接口
+ * 继承MyBatis Plus的BaseMapper，自动拥有CRUD能力
  * 
  * @author WeChat Check-in System
  * @since 1.0.0
@@ -18,14 +17,13 @@ import java.time.LocalDateTime;
 @Mapper
 public interface AdminMapper extends BaseMapper<Admin> {
 
-    /**
-     * 根据用户名查找管理员
-     *
-     * @param username 用户名
-     * @return 管理员信息
-     */
-    @Select("SELECT * FROM admins WHERE username = #{username}")
-    Admin findByUsername(@Param("username") String username);
+    // BaseMapper 已提供以下常用方法：
+    // - selectById(Long id): 根据ID查询
+    // - selectOne(Wrapper wrapper): 条件查询单个
+    // - selectList(Wrapper wrapper): 条件查询列表
+    // - insert(Admin entity): 插入实体
+    // - updateById(Admin entity): 根据ID更新
+    // 推荐使用 LambdaQueryWrapper 进行类型安全的条件查询
 
     /**
      * 更新最后登录信息
@@ -36,31 +34,13 @@ public interface AdminMapper extends BaseMapper<Admin> {
      * @param lastLoginTime 最后登录时间
      * @param lastLoginIp 最后登录IP
      * @return 更新行数
-     * @deprecated 数据库表中已删除相关字段
+     * @deprecated 数据库表中已删除相关字段，建议使用审计日志记录登录信息
      */
     @Deprecated
-    @Update("UPDATE admins SET updated_time = NOW() WHERE id = #{id}")
-    int updateLastLoginInfo(@Param("id") Long id, 
-                           @Param("lastLoginTime") LocalDateTime lastLoginTime, 
-                           @Param("lastLoginIp") String lastLoginIp);
-
-    /**
-     * 检查用户名是否存在
-     *
-     * @param username 用户名
-     * @return 存在数量
-     */
-    @Select("SELECT COUNT(*) FROM admins WHERE username = #{username}")
-    int countByUsername(@Param("username") String username);
-
-    /**
-     * 根据县级代码计算管理员数量
-     *
-     * @param countyCode 县级代码
-     * @return 匹配的管理员数量
-     */
-    @Select("SELECT COUNT(*) FROM admins WHERE county_code = #{countyCode}")
-    int countByCountyCode(@Param("countyCode") String countyCode);
+    default int updateLastLoginInfo(Long id, LocalDateTime lastLoginTime, String lastLoginIp) {
+        // 由于字段已删除，仅保留方法签名，实际不执行任何操作
+        return 0;
+    }
 
     /**
      * 增加登录次数
@@ -68,9 +48,11 @@ public interface AdminMapper extends BaseMapper<Admin> {
      *
      * @param id 管理员ID
      * @return 更新行数
-     * @deprecated 数据库表中已删除相关字段
+     * @deprecated 数据库表中已删除相关字段，建议使用审计日志记录登录信息
      */
     @Deprecated
-    @Update("UPDATE admins SET updated_time = NOW() WHERE id = #{id}")
-    int incrementLoginCount(@Param("id") Long id);
+    default int incrementLoginCount(Long id) {
+        // 由于字段已删除，仅保留方法签名，实际不执行任何操作
+        return 0;
+    }
 }
