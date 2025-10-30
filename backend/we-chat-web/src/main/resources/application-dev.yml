@@ -20,6 +20,13 @@ jwt:
   access-token-expiration: 3600000  # 1小时
   refresh-token-expiration: 86400000  # 1天
 
+# 二维码配置 - 开发环境
+qrcode:
+  secret: wechat-checkin-qrcode-secret-key-2024-development-environment-must-be-at-least-64-bytes-long-for-hs512-algorithm-security
+  issuer: wechat-checkin-qrcode
+  base-url: http://localhost:8080
+  default-expiration-days: 7  # 默认过期时间（天）
+
 # 日志配置 - 开发环境
 logging:
   level:

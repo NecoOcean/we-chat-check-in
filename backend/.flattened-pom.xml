@@ -7,7 +7,7 @@
   <version>1.0.0</version>
   <packaging>pom</packaging>
   <name>WeChat Check-in System</name>
-  <description>WeChat Mini Program Check-in System Backend</description>
+  <description>微信小程序签到系统后端模块，包含用户认证、活动管理、签到记录管理等功能</description>
   <modules>
     <module>we-chat-dependencies</module>
     <module>we-chat-common</module>

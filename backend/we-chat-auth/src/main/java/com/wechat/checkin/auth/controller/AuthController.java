@@ -1,5 +1,6 @@
 package com.wechat.checkin.auth.controller;
 
+import com.wechat.checkin.auth.dto.ChangePasswordRequest;
 import com.wechat.checkin.auth.dto.LoginRequest;
 import com.wechat.checkin.auth.security.UserPrincipal;
 import com.wechat.checkin.auth.service.AuthService;
@@ -137,5 +138,24 @@ public class AuthController {
                 .build();
         
         return Result.success(userInfo);
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param request 修改密码请求
+     * @param principal 当前登录用户
+     * @return 操作结果
+     */
+    @PostMapping("/change-password")
+    @Operation(summary = "修改密码", description = "用户修改自己的登录密码")
+    public Result<Void> changePassword(
+            @Validated @RequestBody ChangePasswordRequest request,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        
+        log.info("用户修改密码: userId={}, username={}", principal.getId(), principal.getUsername());
+        authService.changePassword(principal.getId(), request);
+        
+        return Result.success("密码修改成功，请重新登录");
     }
 }

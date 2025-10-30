@@ -13,16 +13,23 @@ import com.wechat.checkin.activity.vo.ActivityVO;
 import com.wechat.checkin.auth.entity.Admin;
 import com.wechat.checkin.auth.mapper.AdminMapper;
 import com.wechat.checkin.common.enums.ActivityStatusEnum;
+import com.wechat.checkin.common.enums.QrCodeTypeEnum;
 import com.wechat.checkin.common.exception.BusinessException;
 import com.wechat.checkin.common.response.PageResult;
 import com.wechat.checkin.common.response.ResultCode;
 import com.wechat.checkin.common.util.StringUtils;
+import com.wechat.checkin.qrcode.dto.GenerateQrCodeRequest;
+import com.wechat.checkin.qrcode.entity.QrCode;
+import com.wechat.checkin.qrcode.mapper.QrCodeMapper;
+import com.wechat.checkin.qrcode.service.QrCodeService;
+import com.wechat.checkin.qrcode.vo.QrCodeVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +43,8 @@ public class ActivityServiceImpl implements ActivityService {
 
     private final ActivityMapper activityMapper;
     private final AdminMapper adminMapper;
+    private final QrCodeService qrCodeService;
+    private final QrCodeMapper qrCodeMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -59,6 +68,15 @@ public class ActivityServiceImpl implements ActivityService {
 
         log.info("活动创建成功，活动ID: {}, 创建人: {}, 角色: {}, 县域: {}", 
                 activity.getId(), adminId, adminRole, activity.getScopeCountyCode());
+
+        // 自动生成打卡二维码和评价二维码
+        try {
+            generateQrCodesForActivity(activity);
+            log.info("活动二维码自动生成成功，活动ID: {}", activity.getId());
+        } catch (Exception e) {
+            log.error("活动二维码生成失败，活动ID: {}", activity.getId(), e);
+            // 二维码生成失败不影响活动创建，可以后续手动生成
+        }
 
         return activity.getId();
     }
@@ -107,12 +125,16 @@ public class ActivityServiceImpl implements ActivityService {
         int totalAttendees = activityMapper.countTotalAttendees(activityId);
         int evaluationCount = activityMapper.countEvaluations(activityId);
 
+        // 查询活动的二维码列表
+        List<QrCodeVO> qrCodes = getQrCodesForActivity(activityId);
+
         // 构建返回结果
         return ActivityDetailVO.builder()
                 .activity(convertToVO(activity))
                 .participatedCount(participatedCount)
                 .totalAttendees(totalAttendees)
                 .evaluationCount(evaluationCount)
+                .qrCodes(qrCodes)
                 .build();
     }
 
@@ -140,7 +162,88 @@ public class ActivityServiceImpl implements ActivityService {
                     .set(Activity::getEndedTime, LocalDateTime.now());
         activityMapper.update(null, updateWrapper);
 
+        // 自动禁用该活动的所有二维码
+        try {
+            disableQrCodesForActivity(activityId);
+            log.info("活动二维码已自动禁用，活动ID: {}", activityId);
+        } catch (Exception e) {
+            log.error("禁用活动二维码失败，活动ID: {}", activityId, e);
+            // 二维码禁用失败不影响活动结束
+        }
+
         log.info("活动结束成功，活动ID: {}, 操作人: {}", activityId, adminId);
+    }
+
+    /**
+     * 为活动自动生成打卡和评价二维码
+     */
+    private void generateQrCodesForActivity(Activity activity) {
+        LocalDateTime expireTime = activity.getEndTime().plusDays(7); // 活动结束后7天过期
+
+        // 生成打卡二维码
+        GenerateQrCodeRequest checkinRequest = new GenerateQrCodeRequest();
+        checkinRequest.setType(QrCodeTypeEnum.CHECKIN.getValue());
+        checkinRequest.setExpireTime(expireTime);
+        
+        QrCodeVO checkinQrCode = qrCodeService.generateQrCode(activity.getId(), checkinRequest);
+        log.info("打卡二维码生成成功，活动ID: {}, 二维码ID: {}", activity.getId(), checkinQrCode.getId());
+
+        // 生成评价二维码
+        GenerateQrCodeRequest evaluationRequest = new GenerateQrCodeRequest();
+        evaluationRequest.setType(QrCodeTypeEnum.EVALUATION.getValue());
+        evaluationRequest.setExpireTime(expireTime);
+        
+        QrCodeVO evaluationQrCode = qrCodeService.generateQrCode(activity.getId(), evaluationRequest);
+        log.info("评价二维码生成成功，活动ID: {}, 二维码ID: {}", activity.getId(), evaluationQrCode.getId());
+    }
+
+    /**
+     * 禁用活动的所有二维码
+     */
+    private void disableQrCodesForActivity(Long activityId) {
+        // 查询该活动的所有二维码
+        LambdaQueryWrapper<QrCode> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(QrCode::getActivityId, activityId);
+        List<QrCode> qrCodes = qrCodeMapper.selectList(queryWrapper);
+
+        // 禁用所有二维码
+        for (QrCode qrCode : qrCodes) {
+            try {
+                qrCodeService.disableQrCode(qrCode.getId());
+                log.debug("二维码已禁用，二维码ID: {}, 活动ID: {}", qrCode.getId(), activityId);
+            } catch (Exception e) {
+                log.warn("禁用二维码失败，二维码ID: {}, 错误: {}", qrCode.getId(), e.getMessage());
+            }
+        }
+        
+        log.info("活动所有二维码禁用完成，活动ID: {}, 禁用数量: {}", activityId, qrCodes.size());
+    }
+
+    /**
+     * 获取活动的二维码列表
+     */
+    private List<QrCodeVO> getQrCodesForActivity(Long activityId) {
+        // 查询该活动的所有二维码
+        LambdaQueryWrapper<QrCode> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(QrCode::getActivityId, activityId)
+                    .orderByAsc(QrCode::getType);  // 按类型排序，checkin在前
+        
+        List<QrCode> qrCodes = qrCodeMapper.selectList(queryWrapper);
+        
+        // 转换为VO
+        return qrCodes.stream()
+                .map(qrCode -> QrCodeVO.builder()
+                        .id(qrCode.getId())
+                        .activityId(qrCode.getActivityId())
+                        .type(qrCode.getType().getValue())
+                        .token(qrCode.getToken())
+                        .expireTime(qrCode.getExpireTime())
+                        .disabledTime(qrCode.getDisabledTime())
+                        .status(qrCode.getStatus().getValue())
+                        .createdTime(qrCode.getCreatedTime())
+                        .updatedTime(qrCode.getUpdatedTime())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     /**

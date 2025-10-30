@@ -11,7 +11,7 @@
   <artifactId>we-chat-auth</artifactId>
   <version>1.0.0</version>
   <name>WeChat Check-in Auth Module</name>
-  <description>Authentication and authorization module with JWT token management</description>
+  <description>认证模块，包含用户认证、授权和JWT令牌管理</description>
   <dependencies>
     <dependency>
       <groupId>com.wechat.checkin</groupId>

@@ -1,5 +1,6 @@
 package com.wechat.checkin.auth.service;
 
+import com.wechat.checkin.auth.dto.ChangePasswordRequest;
 import com.wechat.checkin.auth.dto.LoginRequest;
 import com.wechat.checkin.auth.vo.LoginResponse;
 
@@ -34,6 +35,14 @@ public interface AuthService {
      * @param accessToken 访问令牌
      */
     void logout(String accessToken);
+
+    /**
+     * 修改密码
+     *
+     * @param userId 用户ID
+     * @param request 修改密码请求
+     */
+    void changePassword(Long userId, ChangePasswordRequest request);
 
     /**
      * 验证令牌

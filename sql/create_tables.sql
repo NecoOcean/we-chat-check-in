@@ -73,7 +73,7 @@ CREATE TABLE `qrcodes` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '二维码ID',
   `activity_id` BIGINT NOT NULL COMMENT '关联活动',
   `type` ENUM('checkin', 'evaluation') NOT NULL COMMENT '类型：打卡/评价',
-  `token` VARCHAR(128) NOT NULL COMMENT '二维码令牌（含签名信息）',
+  `token` VARCHAR(512) NOT NULL COMMENT '二维码令牌（含签名信息，JWT token通常较长）',
   `expire_time` DATETIME NULL COMMENT '过期时间',
   `disabled_time` DATETIME NULL COMMENT '禁用时间',
   `status` ENUM('enabled', 'disabled', 'deleted') NOT NULL DEFAULT 'enabled' COMMENT '状态：启用/禁用/软删除',

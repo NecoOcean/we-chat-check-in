@@ -27,9 +27,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
+                        // 认证相关接口（登录、刷新、登出、验证令牌无需认证）
                         "/api/auth/login",
                         "/api/auth/refresh",
-                        "/api/auth/logout",
+                        "/api/auth/validate",
+                        // 参与端接口（打卡和评价接口无需登录，通过二维码令牌验证）
+                        "/api/checkins/checkin",
+                        "/api/checkins/evaluate",
+                        "/api/qrcodes/verify",
+                        // 文档和健康检查
                         "/actuator/**",
                         "/doc.html",
                         "/webjars/**",
@@ -45,7 +51,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(dataPermissionInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
+                        // 认证相关接口
                         "/api/auth/**",
+                        // 参与端接口（无需数据权限控制）
+                        "/api/checkins/checkin",
+                        "/api/checkins/evaluate",
+                        "/api/qrcodes/verify",
+                        // 文档和健康检查
                         "/actuator/**",
                         "/doc.html",
                         "/webjars/**",

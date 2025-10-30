@@ -30,6 +30,10 @@
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-activity</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.wechat.checkin</groupId>
+            <artifactId>we-chat-qrcode</artifactId>
+        </dependency>
 
         <!-- Spring Boot Starter -->
         <dependency>

@@ -1,6 +1,8 @@
 package com.wechat.checkin.auth.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.wechat.checkin.auth.dto.ChangePasswordRequest;
 import com.wechat.checkin.auth.dto.LoginRequest;
 import com.wechat.checkin.auth.entity.Admin;
 import com.wechat.checkin.auth.mapper.AdminMapper;
@@ -166,6 +168,47 @@ public class AuthServiceImpl implements AuthService {
         // TODO: 实现令牌黑名单机制（可选）
         // 目前JWT是无状态的，客户端删除令牌即可实现登出
         // 如需要服务端控制，可以将令牌加入黑名单（Redis）
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(Long userId, ChangePasswordRequest request) {
+        log.info("用户修改密码: userId={}", userId);
+
+        // 1. 验证新密码和确认密码是否一致
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BusinessException(ResultCode.PARAM_ERROR, "两次输入的新密码不一致");
+        }
+
+        // 2. 验证新旧密码不能相同
+        if (request.getOldPassword().equals(request.getNewPassword())) {
+            throw new BusinessException(ResultCode.PARAM_ERROR, "新密码不能与旧密码相同");
+        }
+
+        // 3. 查询用户
+        Admin admin = adminMapper.selectById(userId);
+        if (admin == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        // 4. 验证旧密码
+        if (!passwordEncoder.matches(request.getOldPassword(), admin.getPassword())) {
+            log.warn("修改密码失败: 旧密码错误, userId={}", userId);
+            throw new BusinessException(ResultCode.PASSWORD_ERROR, "旧密码错误");
+        }
+
+        // 5. 更新密码
+        String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
+        LambdaUpdateWrapper<Admin> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Admin::getId, userId)
+                .set(Admin::getPassword, encodedNewPassword);
+        
+        int updated = adminMapper.update(null, updateWrapper);
+        if (updated == 0) {
+            throw new BusinessException(ResultCode.SYSTEM_ERROR, "密码更新失败");
+        }
+
+        log.info("密码修改成功: userId={}, username={}", userId, admin.getUsername());
     }
 
     @Override
