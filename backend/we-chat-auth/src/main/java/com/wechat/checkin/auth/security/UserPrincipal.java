@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,7 @@ import java.util.Collections;
  * @author WeChat Check-in System
  * @since 1.0.0
  */
+@Slf4j
 @Data
 @Builder
 @NoArgsConstructor
@@ -86,7 +88,11 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 根据角色返回权限
+        // 根据角色返回权限（防止role为null）
+        if (role == null || role.trim().isEmpty()) {
+            log.warn("用户角色为null或空字符串，返回默认权限");
+            return Collections.emptyList();
+        }
         String authority = "ROLE_" + role.toUpperCase();
         return Collections.singletonList(new SimpleGrantedAuthority(authority));
     }

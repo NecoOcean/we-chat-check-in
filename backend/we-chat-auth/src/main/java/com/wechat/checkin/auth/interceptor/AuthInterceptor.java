@@ -100,6 +100,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         String role = jwtTokenProvider.getRoleFromToken(token);
         String countyCode = jwtTokenProvider.getCountyCodeFromToken(token);
 
+        // 校验必须字段
+        if (userId == null || username == null || role == null || role.trim().isEmpty()) {
+            log.error("从JWT提取的用户信息不完整: userId={}, username={}, role={}", userId, username, role);
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "访问令牌信息不完整，请重新登录");
+        }
+
         // 构建Admin对象
         Admin admin = new Admin();
         admin.setId(userId);
