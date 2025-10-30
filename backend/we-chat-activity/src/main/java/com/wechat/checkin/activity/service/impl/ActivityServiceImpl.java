@@ -44,7 +44,7 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity = Activity.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .scopeCountyCode(determineScopeCountyCode(request.getScopeCountyCode(), adminRole, countyCode))
+                .scopeCountyCode(determineScopeCountyCode(adminRole, countyCode))  // 从登录用户获取县域
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .createdId(adminId)
@@ -56,7 +56,8 @@ public class ActivityServiceImpl implements ActivityService {
         // 插入数据库
         activityMapper.insert(activity);
 
-        log.info("活动创建成功，活动ID: {}, 创建人: {}", activity.getId(), adminId);
+        log.info("活动创建成功，活动ID: {}, 创建人: {}, 角色: {}, 县域: {}", 
+                activity.getId(), adminId, adminRole, activity.getScopeCountyCode());
 
         return activity.getId();
     }
@@ -145,27 +146,24 @@ public class ActivityServiceImpl implements ActivityService {
             throw new BusinessException(ResultCode.PARAM_ERROR, "开始时间不能晚于结束时间");
         }
 
-        // 县级管理员必须指定县域范围
-        if ("county".equals(adminRole) && StringUtils.isEmpty(request.getScopeCountyCode())) {
-            throw new BusinessException(ResultCode.PARAM_ERROR, "县级管理员必须指定县域范围");
-        }
-
-        // 县级管理员只能创建本县活动
-        if ("county".equals(adminRole) && !countyCode.equals(request.getScopeCountyCode())) {
-            throw new BusinessException(ResultCode.FORBIDDEN, "县级管理员只能创建本县活动");
+        // 县级管理员必须有县域编码
+        if ("county".equals(adminRole) && StringUtils.isEmpty(countyCode)) {
+            throw new BusinessException(ResultCode.PARAM_ERROR, "县级管理员缺少县域信息");
         }
     }
 
     /**
      * 确定活动的县域范围
+     * 市级管理员：可创建全市活动（scopeCountyCode为null）
+     * 县级管理员：只能创建本县活动（scopeCountyCode为当前登录用户的县域）
      */
-    private String determineScopeCountyCode(String requestCountyCode, String adminRole, String countyCode) {
+    private String determineScopeCountyCode(String adminRole, String countyCode) {
         if ("county".equals(adminRole)) {
-            // 县级管理员：使用其县域编码
+            // 县级管理员：强制使用其县域编码
             return countyCode;
         } else {
-            // 市级管理员：使用请求中的县域编码（可为空）
-            return requestCountyCode;
+            // 市级管理员：scopeCountyCode为null，表示全市范围
+            return null;
         }
     }
 

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -191,12 +192,24 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理静态资源未找到异常（如favicon.ico）
+     * 使用DEBUG级别记录，避免污染错误日志
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Result<Void> handleNoResourceFoundException(NoResourceFoundException e, HttpServletRequest request) {
+        // 对于favicon.ico等静态资源，使用DEBUG级别，不记录ERROR
+        log.debug("静态资源未找到: {}", e.getResourcePath());
+        return Result.error(ResultCode.NOT_FOUND.getCode(), "资源不存在");
+    }
+
+    /**
      * 处理空指针异常
      */
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleNullPointerException(NullPointerException e, HttpServletRequest request) {
-        log.error("空指针异常 - URI: {}", request.getRequestURI(), e);
+        log.error("空指针异常 - URI: {}", request.getRequestURI());
         return Result.error(ResultCode.SYSTEM_ERROR.getCode(), "系统内部错误，请联系管理员");
     }
 
@@ -226,7 +239,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e, HttpServletRequest request) {
-        log.error("未捕获的异常 - URI: {}", request.getRequestURI(), e);
+        log.error("未捕获的异常 - URI: {}", request.getRequestURI());
         return Result.error(ResultCode.SYSTEM_ERROR.getCode(), "系统内部错误，请联系管理员");
     }
 }

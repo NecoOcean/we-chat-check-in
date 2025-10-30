@@ -60,6 +60,7 @@ public class OpenApiConfig {
                 .bearerFormat("JWT")
                 .in(SecurityScheme.In.HEADER)
                 .name("Authorization")
-                .description("请输入JWT Token（不需要Bearer前缀，系统会自动添加）");
+                .description("请输入JWT Token，格式: Bearer <token>（注意Bearer后有一个空格）。" +
+                        "如使用Knife4j全局参数设置，参数名: Authorization, 参数值: Bearer <token>");
     }
 }

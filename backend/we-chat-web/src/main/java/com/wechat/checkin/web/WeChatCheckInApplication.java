@@ -16,11 +16,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ComponentScan(basePackages = {
     "com.wechat.checkin.common",
     "com.wechat.checkin.auth",
+    "com.wechat.checkin.activity",
     "com.wechat.checkin.web"
 })
 @MapperScan(basePackages = {
     "com.wechat.checkin.common.mapper",
-    "com.wechat.checkin.auth.mapper"
+    "com.wechat.checkin.auth.mapper",
+    "com.wechat.checkin.activity.mapper"
 })
 @EnableAsync
 public class WeChatCheckInApplication {

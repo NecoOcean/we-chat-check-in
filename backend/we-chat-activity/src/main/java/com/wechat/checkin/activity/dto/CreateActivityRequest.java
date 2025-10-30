@@ -21,9 +21,6 @@ public class CreateActivityRequest {
     @Schema(description = "活动说明", example = "本次活动旨在提升教学质量")
     private String description;
 
-    @Schema(description = "县域范围编码（县级管理员必填，市级可选）", example = "510100")
-    private String scopeCountyCode;
-
     @NotNull(message = "打卡开始时间不能为空")
     @Schema(description = "打卡开始时间", example = "2024-03-01T08:00:00")
     private LocalDateTime startTime;
