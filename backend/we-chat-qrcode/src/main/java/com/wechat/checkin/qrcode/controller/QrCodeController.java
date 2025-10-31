@@ -113,6 +113,25 @@ public class QrCodeController {
     }
 
     /**
+     * 批量禁用二维码
+     *
+     * @param ids 二维码ID列表
+     * @return 操作结果
+     */
+    @PatchMapping("/qrcodes/batch-disable")
+    @RequireRole({"city", "county"})
+    @Operation(summary = "批量禁用二维码", description = "批量禁用指定的二维码")
+    public Result<Void> disableQrCodesBatch(
+            @Parameter(description = "二维码ID列表", required = true)
+            @RequestBody java.util.List<Long> ids) {
+        
+        log.info("批量禁用二维码: 数量={}", ids.size());
+        qrCodeService.disableQrCodesBatch(ids);
+        
+        return Result.success("二维码批量禁用成功");
+    }
+
+    /**
      * 验证二维码（参与端使用，无需登录）
      *
      * @param token 二维码令牌

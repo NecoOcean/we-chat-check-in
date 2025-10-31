@@ -213,6 +213,26 @@ public class QrCodeServiceImpl implements QrCodeService {
     }
 
     @Override
+    @Transactional
+    public void disableQrCodesBatch(java.util.List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            log.warn("批量禁用二维码: 二维码ID列表为空");
+            return;
+        }
+
+        log.info("批量禁用二维码: 数量={}", ids.size());
+
+        // 批量更新二维码状态
+        LambdaUpdateWrapper<QrCode> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.in(QrCode::getId, ids)
+                .set(QrCode::getStatus, QrCodeStatusEnum.DISABLED)
+                .set(QrCode::getDisabledTime, LocalDateTime.now());
+
+        int updated = qrCodeMapper.update(null, updateWrapper);
+        log.info("批量禁用二维码完成: 总数={}, 成功={}", ids.size(), updated);
+    }
+
+    @Override
     public QrCodeVerifyResultVO verifyQrCode(String token) {
         log.info("验证二维码令牌");
 
@@ -333,6 +353,130 @@ public class QrCodeServiceImpl implements QrCodeService {
                 .createdTime(qrCode.getCreatedTime())
                 .updatedTime(qrCode.getUpdatedTime())
                 .build();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void disableQrCodesByType(Long activityId, String type) {
+        log.info("按类型禁用二维码: activityId={}, type={}", activityId, type);
+
+        try {
+            QrCodeTypeEnum typeEnum = QrCodeTypeEnum.valueOf(type.toUpperCase());
+            
+            LambdaUpdateWrapper<QrCode> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(QrCode::getActivityId, activityId)
+                    .eq(QrCode::getType, typeEnum)
+                    .set(QrCode::getStatus, QrCodeStatusEnum.DISABLED)
+                    .set(QrCode::getDisabledTime, LocalDateTime.now());
+            
+            int updated = qrCodeMapper.update(null, updateWrapper);
+            log.info("二维码按类型禁用完成: activityId={}, type={}, 禁用数量={}", 
+                activityId, type, updated);
+        } catch (IllegalArgumentException e) {
+            log.warn("无效的二维码类型: {}", type);
+            throw new BusinessException(ResultCode.PARAM_ERROR, "无效的二维码类型: " + type);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void disableQrCodesExcept(Long activityId, String... excludedTypes) {
+        log.info("按类型禁用二维码（保留指定类型）: activityId={}, excludedTypes={}", 
+            activityId, java.util.Arrays.toString(excludedTypes));
+
+        if (excludedTypes == null || excludedTypes.length == 0) {
+            // 如果没有排除类型，禁用所有二维码
+            disableAllQrCodesForActivity(activityId);
+            return;
+        }
+
+        // 将排除的类型转换为枚举
+        java.util.Set<QrCodeTypeEnum> excludedEnums = new java.util.HashSet<>();
+        for (String type : excludedTypes) {
+            try {
+                excludedEnums.add(QrCodeTypeEnum.valueOf(type.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                log.warn("无效的二维码类型: {}", type);
+            }
+        }
+
+        // 查询该活动的所有二维码
+        LambdaQueryWrapper<QrCode> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(QrCode::getActivityId, activityId);
+        java.util.List<QrCode> qrCodes = qrCodeMapper.selectList(queryWrapper);
+
+        int disabledCount = 0;
+        for (QrCode qrCode : qrCodes) {
+            // 如果类型不在排除列表中，则禁用
+            if (!excludedEnums.contains(qrCode.getType())) {
+                LambdaUpdateWrapper<QrCode> updateWrapper = new LambdaUpdateWrapper<>();
+                updateWrapper.eq(QrCode::getId, qrCode.getId())
+                        .set(QrCode::getStatus, QrCodeStatusEnum.DISABLED)
+                        .set(QrCode::getDisabledTime, LocalDateTime.now());
+                
+                int updated = qrCodeMapper.update(null, updateWrapper);
+                if (updated > 0) {
+                    disabledCount++;
+                    log.debug("二维码已禁用: id={}, type={}, activityId={}", 
+                        qrCode.getId(), qrCode.getType(), activityId);
+                }
+            } else {
+                log.debug("二维码已保留: id={}, type={}, activityId={}", 
+                    qrCode.getId(), qrCode.getType(), activityId);
+            }
+        }
+
+        log.info("二维码按类型禁用完成: activityId={}, 禁用数量={}, 保留数量={}", 
+            activityId, disabledCount, qrCodes.size() - disabledCount);
+    }
+
+    /**
+     * 禁用活动的所有二维码（私有方法）
+     */
+    private void disableAllQrCodesForActivity(Long activityId) {
+        LambdaUpdateWrapper<QrCode> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(QrCode::getActivityId, activityId)
+                .set(QrCode::getStatus, QrCodeStatusEnum.DISABLED)
+                .set(QrCode::getDisabledTime, LocalDateTime.now());
+        
+        int updated = qrCodeMapper.update(null, updateWrapper);
+        log.info("活动所有二维码已禁用: activityId={}, 禁用数量={}", activityId, updated);
+    }
+
+    @Override
+    public QrCodeVerifyResultVO verifyQrCodeOfType(String token, String expectedType) {
+        log.info("验证特定类型二维码: expectedType={}", expectedType);
+
+        try {
+            // 1. 先进行基础验证
+            QrCodeVerifyResultVO baseResult = verifyQrCode(token);
+            if (!baseResult.getValid()) {
+                return baseResult;
+            }
+
+            // 2. 检查类型是否匹配
+            String actualType = baseResult.getType();
+            if (!expectedType.equalsIgnoreCase(actualType)) {
+                log.warn("二维码类型不匹配: expected={}, actual={}", expectedType, actualType);
+                return QrCodeVerifyResultVO.builder()
+                        .valid(false)
+                        .qrcodeId(baseResult.getQrcodeId())
+                        .activityId(baseResult.getActivityId())
+                        .type(actualType)
+                        .reason(String.format("二维码类型不匹配，期望: %s, 实际: %s", expectedType, actualType))
+                        .build();
+            }
+
+            // 3. 类型匹配，返回验证通过
+            return baseResult;
+
+        } catch (Exception e) {
+            log.error("二维码类型验证异常", e);
+            return QrCodeVerifyResultVO.builder()
+                    .valid(false)
+                    .reason("二维码验证失败: " + e.getMessage())
+                    .build();
+        }
     }
 }
 

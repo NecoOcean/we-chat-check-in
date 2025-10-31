@@ -8,10 +8,10 @@
     <version>1.0.0</version>
   </parent>
   <groupId>com.wechat.checkin</groupId>
-  <artifactId>we-chat-web</artifactId>
+  <artifactId>we-chat-evaluation</artifactId>
   <version>1.0.0</version>
-  <name>WeChat Check-in Web Module</name>
-  <description>Web启动模块，提供REST API接口和应用程序入口</description>
+  <name>WeChat Activity Evaluation Module</name>
+  <description>活动评价模块，提供评价提交、参与资格校验、统计汇总等功能</description>
   <dependencies>
     <dependency>
       <groupId>com.wechat.checkin</groupId>
@@ -23,19 +23,19 @@
     </dependency>
     <dependency>
       <groupId>com.wechat.checkin</groupId>
-      <artifactId>we-chat-activity</artifactId>
+      <artifactId>we-chat-qrcode</artifactId>
     </dependency>
     <dependency>
       <groupId>com.wechat.checkin</groupId>
-      <artifactId>we-chat-qrcode</artifactId>
+      <artifactId>we-chat-activity</artifactId>
     </dependency>
     <dependency>
       <groupId>com.wechat.checkin</groupId>
       <artifactId>we-chat-checkins</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.wechat.checkin</groupId>
-      <artifactId>we-chat-evaluation</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -43,15 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mybatis.spring.boot</groupId>
@@ -70,18 +62,22 @@
       <artifactId>hutool-all</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct-processor</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <optional>true</optional>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -93,29 +89,4 @@
       <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
     </dependency>
   </dependencies>
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.yml</include>
-          <include>**/*.xml</include>
-        </includes>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-            </exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

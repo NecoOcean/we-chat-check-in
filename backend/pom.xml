@@ -21,6 +21,7 @@
         <module>we-chat-web</module>
         <module>we-chat-qrcode</module>
         <module>we-chat-checkins</module>
+        <module>we-chat-evaluation</module>
     </modules>
 
     <!-- 属性配置 -->
@@ -85,6 +86,11 @@
            <dependency>
                <groupId>com.wechat.checkin</groupId>
                <artifactId>we-chat-checkins</artifactId>
+               <version>${revision}</version>
+           </dependency>
+           <dependency>
+               <groupId>com.wechat.checkin</groupId>
+               <artifactId>we-chat-evaluation</artifactId>
                <version>${revision}</version>
            </dependency>
         </dependencies>

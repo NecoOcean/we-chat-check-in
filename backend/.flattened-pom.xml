@@ -16,6 +16,7 @@
     <module>we-chat-web</module>
     <module>we-chat-qrcode</module>
     <module>we-chat-checkins</module>
+    <module>we-chat-evaluation</module>
   </modules>
   <properties>
     <java.version>17</java.version>
@@ -63,6 +64,11 @@
       <dependency>
         <groupId>com.wechat.checkin</groupId>
         <artifactId>we-chat-checkins</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.wechat.checkin</groupId>
+        <artifactId>we-chat-evaluation</artifactId>
         <version>1.0.0</version>
       </dependency>
     </dependencies>

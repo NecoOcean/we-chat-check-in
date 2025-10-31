@@ -10,6 +10,8 @@ import com.wechat.checkin.activity.mapper.ActivityMapper;
 import com.wechat.checkin.activity.service.ActivityService;
 import com.wechat.checkin.activity.vo.ActivityDetailVO;
 import com.wechat.checkin.activity.vo.ActivityVO;
+import com.wechat.checkin.activity.vo.CheckinDetailVO;
+import com.wechat.checkin.activity.vo.CountyCheckinStatisticsVO;
 import com.wechat.checkin.auth.entity.Admin;
 import com.wechat.checkin.auth.mapper.AdminMapper;
 import com.wechat.checkin.common.enums.ActivityStatusEnum;
@@ -29,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -125,8 +126,8 @@ public class ActivityServiceImpl implements ActivityService {
         int totalAttendees = activityMapper.countTotalAttendees(activityId);
         int evaluationCount = activityMapper.countEvaluations(activityId);
 
-        // 查询活动的二维码列表
-        List<QrCodeVO> qrCodes = getQrCodesForActivity(activityId);
+        // 获取二维码列表
+        List<com.wechat.checkin.qrcode.vo.QrCodeVO> qrCodes = getQrCodesForActivity(activityId);
 
         // 构建返回结果
         return ActivityDetailVO.builder()
@@ -164,7 +165,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         // 自动禁用该活动的所有二维码
         try {
-            disableQrCodesForActivity(activityId);
+            disableQrCodesForActivityOptimized(activityId);
             log.info("活动二维码已自动禁用，活动ID: {}", activityId);
         } catch (Exception e) {
             log.error("禁用活动二维码失败，活动ID: {}", activityId, e);
@@ -198,25 +199,73 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     /**
-     * 禁用活动的所有二维码
+     * 禁用活动的所有二维码（包括打卡和评价）
+     * 
+     * v1.1.0 优化版本：使用QrCodeService.disableQrCodesBatch
      */
-    private void disableQrCodesForActivity(Long activityId) {
+    private void disableQrCodesForActivityOptimized(Long activityId) {
+        // 查询该活动的所有二维码ID
+        LambdaQueryWrapper<QrCode> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(QrCode::getActivityId, activityId)
+                    .select(QrCode::getId);
+        
+        List<QrCode> qrCodes = qrCodeMapper.selectList(queryWrapper);
+        
+        if (qrCodes.isEmpty()) {
+            log.info("活动没有二维码，活动ID: {}", activityId);
+            return;
+        }
+
+        // 使用优化的禁用方法：只禁用打卡二维码，保留评价二维码以支持活动后评价
+        try {
+            qrCodeService.disableQrCodesExcept(activityId, QrCodeTypeEnum.EVALUATION.getValue());
+            log.info("活动打卡二维码已禁用，评价二维码保留，活动ID: {}", activityId);
+        } catch (Exception e) {
+            log.error("禁用活动二维码失败，活动ID: {}", activityId, e);
+            // 二维码禁用失败不影响活动结束
+        }
+    }
+
+    /**
+     * 禁用活动的所有二维码（包括打卡和评价）
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void disableAllQrCodesForActivity(Long activityId, Long adminId, String adminRole, String countyCode) {
+        log.info("禁用活动所有二维码: activityId={}, adminId={}", activityId, adminId);
+
+        // 查询活动
+        Activity activity = activityMapper.selectById(activityId);
+        if (activity == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "活动不存在");
+        }
+
+        // 权限校验
+        validateActivityPermission(activity, adminRole, countyCode);
+
         // 查询该活动的所有二维码
         LambdaQueryWrapper<QrCode> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(QrCode::getActivityId, activityId);
         List<QrCode> qrCodes = qrCodeMapper.selectList(queryWrapper);
 
-        // 禁用所有二维码
-        for (QrCode qrCode : qrCodes) {
-            try {
-                qrCodeService.disableQrCode(qrCode.getId());
-                log.debug("二维码已禁用，二维码ID: {}, 活动ID: {}", qrCode.getId(), activityId);
-            } catch (Exception e) {
-                log.warn("禁用二维码失败，二维码ID: {}, 错误: {}", qrCode.getId(), e.getMessage());
-            }
+        if (qrCodes.isEmpty()) {
+            log.info("活动没有二维码，活动ID: {}", activityId);
+            return;
         }
-        
-        log.info("活动所有二维码禁用完成，活动ID: {}, 禁用数量: {}", activityId, qrCodes.size());
+
+        // 提取所有二维码ID
+        List<Long> qrCodeIds = qrCodes.stream()
+                .map(QrCode::getId)
+                .collect(Collectors.toList());
+
+        // 使用QrCodeService的新方法禁用所有二维码
+        try {
+            qrCodeService.disableQrCodesBatch(qrCodeIds);
+            log.info("活动所有二维码已禁用，活动ID: {}", activityId);
+        } catch (Exception e) {
+            log.error("禁用活动所有二维码失败，活动ID: {}", activityId, e);
+            throw new BusinessException(ResultCode.SYSTEM_ERROR, "禁用二维码失败");
+        }
     }
 
     /**
@@ -242,6 +291,91 @@ public class ActivityServiceImpl implements ActivityService {
                         .status(qrCode.getStatus().getValue())
                         .createdTime(qrCode.getCreatedTime())
                         .updatedTime(qrCode.getUpdatedTime())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取活动的县域打卡统计（v1.1.0新增）
+     */
+    @Override
+    public ActivityDetailVO getCountyCheckinStatistics(Long activityId, String adminRole, String countyCode) {
+        log.info("查询活动的县域打卡统计: activityId={}, adminRole={}", activityId, adminRole);
+
+        // 查询活动
+        Activity activity = activityMapper.selectById(activityId);
+        if (activity == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "活动不存在");
+        }
+
+        // 权限校验
+        validateActivityPermission(activity, adminRole, countyCode);
+
+        // 查询统计数据
+        int participatedCount = activityMapper.countParticipatedTeachingPoints(activityId);
+        int totalAttendees = activityMapper.countTotalAttendees(activityId);
+        int evaluationCount = activityMapper.countEvaluations(activityId);
+
+        // 获取二维码列表
+        List<com.wechat.checkin.qrcode.vo.QrCodeVO> qrCodes = getQrCodesForActivity(activityId);
+
+        // 获取县域统计（仅市级管理员）
+        List<CountyCheckinStatisticsVO> countyStatistics = null;
+        if ("city".equals(adminRole)) {
+            countyStatistics = buildCountyCheckinStatistics(activityId);
+        }
+
+        // 获取打卡详情
+        List<CheckinDetailVO> checkinDetails = buildCheckinDetails(activityId);
+
+        // 构建返回结果
+        return ActivityDetailVO.builder()
+                .activity(convertToVO(activity))
+                .participatedCount(participatedCount)
+                .totalAttendees(totalAttendees)
+                .evaluationCount(evaluationCount)
+                .qrCodes(qrCodes)
+                .countyStatistics(countyStatistics)
+                .checkinDetails(checkinDetails)
+                .build();
+    }
+
+    /**
+     * 构建县域打卡统计
+     */
+    private List<CountyCheckinStatisticsVO> buildCountyCheckinStatistics(Long activityId) {
+        log.info("构建县域打卡统计: activityId={}", activityId);
+        
+        List<java.util.Map<String, Object>> rawData = activityMapper.selectCountyCheckinStatistics(activityId);
+        
+        return rawData.stream()
+                .map(row -> CountyCheckinStatisticsVO.builder()
+                        .countyCode((String) row.get("countyCode"))
+                        .countyName((String) row.get("countyName"))  // 直接从SQL结果中获取
+                        .participatingPoints(((Number) row.get("participatingPoints")).intValue())
+                        .totalAttendees(((Number) row.get("totalAttendees")).intValue())
+                        .totalCheckins(((Number) row.get("totalCheckins")).intValue())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 构建打卡详情列表
+     */
+    private List<CheckinDetailVO> buildCheckinDetails(Long activityId) {
+        log.info("构建打卡详情列表: activityId={}", activityId);
+        
+        List<java.util.Map<String, Object>> rawData = activityMapper.selectCheckinDetails(activityId);
+        
+        return rawData.stream()
+                .map(row -> CheckinDetailVO.builder()
+                        .id(((Number) row.get("id")).longValue())
+                        .teachingPointId(((Number) row.get("teachingPointId")).longValue())
+                        .teachingPointName((String) row.get("teachingPointName"))
+                        .countyCode((String) row.get("countyCode"))
+                        .countyName((String) row.get("countyName"))
+                        .attendeeCount(((Number) row.get("attendeeCount")).intValue())
+                        .submittedTime((java.time.LocalDateTime) row.get("submittedTime"))
                         .build())
                 .collect(Collectors.toList());
     }

@@ -34,6 +34,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         // 参与端接口（打卡和评价接口无需登录，通过二维码令牌验证）
                         "/api/checkins/checkin",
                         "/api/checkins/evaluate",
+                        "/api/evaluations/evaluation",
                         "/api/qrcodes/verify",
                         // 文档和健康检查
                         "/actuator/**",
@@ -56,6 +57,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         // 参与端接口（无需数据权限控制）
                         "/api/checkins/checkin",
                         "/api/checkins/evaluate",
+                        "/api/evaluations/evaluation",
                         "/api/qrcodes/verify",
                         // 文档和健康检查
                         "/actuator/**",

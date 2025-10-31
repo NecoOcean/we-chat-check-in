@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wechat.checkin.activity.entity.Activity;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
+
 /**
  * 活动数据访问层
  * 继承MyBatis Plus的BaseMapper，自动拥有CRUD能力
@@ -49,4 +51,45 @@ public interface ActivityMapper extends BaseMapper<Activity> {
      */
     @Select("SELECT COUNT(*) FROM evaluations WHERE activity_id = #{activityId}")
     int countEvaluations(@Param("activityId") Long activityId);
+
+    /**
+     * 按县域统计打卡情况（v1.1.0新增）
+     * 
+     * @param activityId 活动ID
+     * @return 县域统计列表
+     */
+    @Select("SELECT " +
+            "COALESCE(tp.county_code, 'UNKNOWN') as countyCode, " +
+            "COALESCE(ct.name, '未分类') as countyName, " +
+            "COUNT(DISTINCT c.teaching_point_id) as participatingPoints, " +
+            "COALESCE(SUM(c.attendee_count), 0) as totalAttendees, " +
+            "COUNT(*) as totalCheckins " +
+            "FROM checkins c " +
+            "LEFT JOIN teaching_points tp ON c.teaching_point_id = tp.id " +
+            "LEFT JOIN counties ct ON tp.county_code = ct.code " +
+            "WHERE c.activity_id = #{activityId} " +
+            "GROUP BY tp.county_code " +
+            "ORDER BY tp.county_code")
+    List<java.util.Map<String, Object>> selectCountyCheckinStatistics(@Param("activityId") Long activityId);
+
+    /**
+     * 查询活动的所有打卡详情（v1.1.0新增）
+     * 
+     * @param activityId 活动ID
+     * @return 打卡详情列表
+     */
+    @Select("SELECT " +
+            "c.id, " +
+            "c.teaching_point_id as teachingPointId, " +
+            "COALESCE(tp.name, '未知教学点') as teachingPointName, " +
+            "COALESCE(tp.county_code, 'UNKNOWN') as countyCode, " +
+            "COALESCE(ct.name, '未分类') as countyName, " +
+            "c.attendee_count as attendeeCount, " +
+            "c.submitted_time as submittedTime " +
+            "FROM checkins c " +
+            "LEFT JOIN teaching_points tp ON c.teaching_point_id = tp.id " +
+            "LEFT JOIN counties ct ON tp.county_code = ct.code " +
+            "WHERE c.activity_id = #{activityId} " +
+            "ORDER BY tp.county_code, c.submitted_time DESC")
+    List<java.util.Map<String, Object>> selectCheckinDetails(@Param("activityId") Long activityId);
 }

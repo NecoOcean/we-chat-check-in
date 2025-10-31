@@ -47,6 +47,13 @@ public interface QrCodeService {
     void disableQrCode(Long id);
 
     /**
+     * 批量禁用二维码
+     *
+     * @param ids 二维码ID列表
+     */
+    void disableQrCodesBatch(java.util.List<Long> ids);
+
+    /**
      * 验证二维码（参与端使用）
      *
      * @param token 二维码令牌
@@ -61,5 +68,35 @@ public interface QrCodeService {
      * @return 二维码信息
      */
     QrCodeVO getQrCodeByToken(String token);
+
+    /**
+     * 按类型禁用二维码（新增）
+     *
+     * @param activityId 活动ID
+     * @param type 二维码类型
+     */
+    void disableQrCodesByType(Long activityId, String type);
+
+    /**
+     * 按类型禁用除外的所有二维码（新增）
+     * 
+     * 示例：禁用打卡二维码但保留评价二维码
+     * disableQrCodesExcept(activityId, "evaluation")
+     *
+     * @param activityId 活动ID
+     * @param excludedTypes 需要保留的二维码类型（不禁用）
+     */
+    void disableQrCodesExcept(Long activityId, String... excludedTypes);
+
+    /**
+     * 验证特定类型的二维码（新增）
+     * 
+     * 相比 verifyQrCode，此方法额外检查二维码类型是否匹配
+     *
+     * @param token 二维码令牌
+     * @param expectedType 期望的二维码类型
+     * @return 验证结果
+     */
+    QrCodeVerifyResultVO verifyQrCodeOfType(String token, String expectedType);
 }
 

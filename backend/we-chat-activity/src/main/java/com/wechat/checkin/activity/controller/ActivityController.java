@@ -94,4 +94,37 @@ public class ActivityController {
 
         return Result.success();
     }
+
+    @Operation(summary = "禁用活动所有二维码", description = "禁用该活动的所有二维码（包括打卡和评价）")
+    @PostMapping("/{id}/disable-qrcodes")
+    @RequireRole({"city", "county"})
+    public Result<Void> disableAllQrCodesForActivity(
+            @Parameter(description = "活动ID") @PathVariable("id") Long activityId,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal) {
+
+        activityService.disableAllQrCodesForActivity(
+                activityId,
+                principal.getId(),
+                principal.getRole(),
+                principal.getCountyCode()
+        );
+
+        return Result.success("活动所有二维码已禁用");
+    }
+
+    @Operation(summary = "获取活动的县域打卡统计", description = "市级管理员可获取各县域的打卡情况统计，包括参与教学点数、累计人数和打卡详情（v1.1.0新增）")
+    @GetMapping("/{id}/county-statistics")
+    @RequireRole({"city", "county"})
+    public Result<ActivityDetailVO> getCountyCheckinStatistics(
+            @Parameter(description = "活动ID") @PathVariable("id") Long activityId,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal) {
+
+        ActivityDetailVO statistics = activityService.getCountyCheckinStatistics(
+                activityId,
+                principal.getRole(),
+                principal.getCountyCode()
+        );
+
+        return Result.success(statistics);
+    }
 }

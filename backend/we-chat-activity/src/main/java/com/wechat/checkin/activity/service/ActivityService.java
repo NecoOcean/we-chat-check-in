@@ -51,4 +51,25 @@ public interface ActivityService {
      * @param countyCode 管理员县域编码
      */
     void finishActivity(Long activityId, Long adminId, String adminRole, String countyCode);
+
+    /**
+     * 禁用活动的所有二维码
+     *
+     * @param activityId 活动ID
+     * @param adminId 管理员ID
+     * @param adminRole 管理员角色
+     * @param countyCode 管理员县域编码
+     */
+    void disableAllQrCodesForActivity(Long activityId, Long adminId, String adminRole, String countyCode);
+
+    /**
+     * 获取活动的县域打卡统计（v1.1.0新增）
+     * 市级管理员可获取各县域的打卡统计，包括参与教学点数和累计人数
+     *
+     * @param activityId 活动ID
+     * @param adminRole 管理员角色
+     * @param countyCode 管理员县域编码
+     * @return 包含县域统计和打卡详情的活动详情VO
+     */
+    ActivityDetailVO getCountyCheckinStatistics(Long activityId, String adminRole, String countyCode);
 }
