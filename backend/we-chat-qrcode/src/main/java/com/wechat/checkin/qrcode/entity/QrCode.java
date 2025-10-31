@@ -3,6 +3,7 @@ package com.wechat.checkin.qrcode.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.wechat.checkin.common.enums.QrCodeStatusEnum;
 import com.wechat.checkin.common.enums.QrCodeTypeEnum;
+import com.wechat.checkin.common.handler.QrCodeTypeEnumTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -35,7 +36,7 @@ public class QrCode {
     /**
      * 二维码类型：checkin-打卡，evaluation-评价
      */
-    @TableField("type")
+    @TableField(value = "type", typeHandler = QrCodeTypeEnumTypeHandler.class)
     private QrCodeTypeEnum type;
 
     /**
