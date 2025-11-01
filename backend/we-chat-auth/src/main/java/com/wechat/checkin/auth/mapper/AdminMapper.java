@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wechat.checkin.auth.entity.Admin;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +26,53 @@ public interface AdminMapper extends BaseMapper<Admin> {
     // - insert(Admin entity): 插入实体
     // - updateById(Admin entity): 根据ID更新
     // 推荐使用 LambdaQueryWrapper 进行类型安全的条件查询
+
+    /**
+     * 根据用户名查询管理员
+     *
+     * @param username 用户名
+     * @return 管理员信息
+     */
+    @Select("SELECT * FROM admins WHERE username = #{username}")
+    Admin selectByUsername(@Param("username") String username);
+
+    /**
+     * 更新管理员密码
+     *
+     * @param id 管理员ID
+     * @param newPassword 新密码
+     * @return 影响行数
+     */
+    @Update("UPDATE admins SET password = #{newPassword}, updated_time = NOW() WHERE id = #{id}")
+    int updatePassword(@Param("id") Long id, @Param("newPassword") String newPassword);
+
+    /**
+     * 统计指定用户名的管理员数量（排除指定ID）
+     *
+     * @param username 用户名
+     * @param excludeId 排除的ID
+     * @return 数量
+     */
+    @Select("SELECT COUNT(*) FROM admins WHERE username = #{username} AND id != #{excludeId}")
+    int countByUsernameExcludeId(@Param("username") String username, @Param("excludeId") Long excludeId);
+
+    /**
+     * 统计指定用户名的管理员数量
+     *
+     * @param username 用户名
+     * @return 数量
+     */
+    @Select("SELECT COUNT(*) FROM admins WHERE username = #{username}")
+    int countByUsername(@Param("username") String username);
+
+    /**
+     * 检查县域代码是否存在
+     *
+     * @param countyCode 县域代码
+     * @return 是否存在
+     */
+    @Select("SELECT COUNT(*) > 0 FROM counties WHERE code = #{countyCode} AND status != 'deleted'")
+    boolean existsCountyCode(@Param("countyCode") String countyCode);
 
     /**
      * 更新最后登录信息

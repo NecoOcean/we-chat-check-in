@@ -42,6 +42,11 @@ public enum ResultCode {
     USER_DISABLED(1102, "用户已被禁用"),
     USER_ALREADY_EXISTS(1103, "用户已存在"),
     PASSWORD_ERROR(1104, "密码错误"),
+    USERNAME_EXISTS(1105, "用户名已存在"),
+    ADMIN_NOT_FOUND(1106, "管理员不存在"),
+    ADMIN_DELETED(1107, "管理员已被删除"),
+    OPERATION_FAILED(1108, "操作失败"),
+    COUNTY_CODE_NOT_FOUND(1109, "县域代码不存在"),
     
     // 认证授权错误 12xx
     TOKEN_INVALID(1201, "令牌无效"),

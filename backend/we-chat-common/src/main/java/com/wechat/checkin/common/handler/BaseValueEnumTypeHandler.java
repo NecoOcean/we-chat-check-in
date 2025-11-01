@@ -58,7 +58,6 @@ public abstract class BaseValueEnumTypeHandler<E extends Enum<E>> extends BaseTy
      * 获取结果：将数据库字符串转换为枚举值
      */
     @Override
-    @SuppressWarnings("unchecked")
     public E getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String value = rs.getString(columnName);
         return convertToEnum(value);
@@ -68,7 +67,6 @@ public abstract class BaseValueEnumTypeHandler<E extends Enum<E>> extends BaseTy
      * 获取结果：将数据库字符串转换为枚举值（通过列索引）
      */
     @Override
-    @SuppressWarnings("unchecked")
     public E getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String value = rs.getString(columnIndex);
         return convertToEnum(value);
@@ -78,7 +76,6 @@ public abstract class BaseValueEnumTypeHandler<E extends Enum<E>> extends BaseTy
      * 获取结果：将数据库字符串转换为枚举值（存储过程调用）
      */
     @Override
-    @SuppressWarnings("unchecked")
     public E getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String value = cs.getString(columnIndex);
         return convertToEnum(value);
