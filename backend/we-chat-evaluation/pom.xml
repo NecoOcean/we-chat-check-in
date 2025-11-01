@@ -13,7 +13,7 @@
 
     <artifactId>we-chat-evaluation</artifactId>
     <packaging>jar</packaging>
-    <name>WeChat Activity Evaluation Module</name>
+    <name>WeChat Check-in Evaluation Module</name>
     <description>活动评价模块，提供评价提交、参与资格校验、统计汇总等功能</description>
 
     <dependencies>

@@ -99,7 +99,13 @@ public enum ResultCode {
     // 外部服务错误 20xx（原19xx移至20xx）
     WECHAT_API_ERROR(2001, "微信接口调用失败"),
     SMS_SEND_FAILED(2002, "短信发送失败"),
-    EMAIL_SEND_FAILED(2003, "邮件发送失败");
+    EMAIL_SEND_FAILED(2003, "邮件发送失败"),
+    
+    // 县域相关错误 21xx
+    COUNTY_NOT_FOUND(2101, "县域不存在"),
+    COUNTY_ALREADY_EXISTS(2102, "县域编码已存在"),
+    COUNTY_NAME_EXISTS(2103, "县域名称已存在"),
+    COUNTY_DELETED(2104, "县域已被删除");
 
     /**
      * 状态码

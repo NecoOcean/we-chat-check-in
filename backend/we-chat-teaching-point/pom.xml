@@ -17,13 +17,11 @@
     <description>教学点管理模块，包含教学点的创建、查询、更新、删除等功能</description>
 
     <dependencies>
-        <!-- 依赖公共模块 -->
+        <!-- 内部模块依赖 -->
         <dependency>
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-common</artifactId>
         </dependency>
-
-        <!-- 依赖认证模块 -->
         <dependency>
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-auth</artifactId>

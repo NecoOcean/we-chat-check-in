@@ -11,10 +11,10 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>we-chat-admin</artifactId>
+    <artifactId>we-chat-county</artifactId>
     <packaging>jar</packaging>
-    <name>WeChat Check-in Admin Module</name>
-    <description>用户管理模块，包含县级管理员账号管理、权限配置等功能</description>
+    <name>WeChat Check-in County Module</name>
+    <description>县域管理模块，包含县域的创建、查询、更新、删除和状态管理等功能</description>
 
     <dependencies>
         <!-- 内部模块依赖 -->
@@ -61,12 +61,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-
-        <!-- BCrypt密码加密 -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
         <!-- Hutool工具类 -->

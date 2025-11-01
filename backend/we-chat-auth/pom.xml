@@ -17,7 +17,7 @@
     <description>认证模块，包含用户认证、授权和JWT令牌管理</description>
 
     <dependencies>
-        <!-- 依赖公共模块 -->
+        <!-- 内部模块依赖 -->
         <dependency>
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-common</artifactId>

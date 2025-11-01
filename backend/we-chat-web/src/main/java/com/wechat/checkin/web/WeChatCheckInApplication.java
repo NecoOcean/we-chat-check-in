@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
     "com.wechat.checkin.evaluation",
     "com.wechat.checkin.admin",
     "com.wechat.checkin.teachingpoint",
+    "com.wechat.checkin.county",
     "com.wechat.checkin.web"
 })
 @MapperScan(basePackages = {
@@ -31,7 +32,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
     "com.wechat.checkin.checkins.mapper",
     "com.wechat.checkin.evaluation.mapper",
     "com.wechat.checkin.admin.mapper",
-    "com.wechat.checkin.teachingpoint.mapper"
+    "com.wechat.checkin.teachingpoint.mapper",
+    "com.wechat.checkin.county.mapper"
 })
 @EnableAsync
 public class WeChatCheckInApplication {

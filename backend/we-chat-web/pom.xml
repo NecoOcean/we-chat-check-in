@@ -50,6 +50,10 @@
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-teaching-point</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.wechat.checkin</groupId>
+            <artifactId>we-chat-county</artifactId>
+        </dependency>
 
         <!-- Spring Boot Starter -->
         <dependency>

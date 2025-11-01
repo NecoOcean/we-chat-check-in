@@ -20,11 +20,9 @@
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-common</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-auth</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Spring Boot Web -->
