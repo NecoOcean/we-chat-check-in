@@ -46,6 +46,10 @@
             <groupId>com.wechat.checkin</groupId>
             <artifactId>we-chat-admin</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.wechat.checkin</groupId>
+            <artifactId>we-chat-teaching-point</artifactId>
+        </dependency>
 
         <!-- Spring Boot Starter -->
         <dependency>

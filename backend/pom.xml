@@ -23,6 +23,7 @@
         <module>we-chat-checkins</module>
         <module>we-chat-evaluation</module>
         <module>we-chat-admin</module>
+        <module>we-chat-teaching-point</module>
     </modules>
 
     <!-- 属性配置 -->
@@ -97,6 +98,11 @@
            <dependency>
                <groupId>com.wechat.checkin</groupId>
                <artifactId>we-chat-admin</artifactId>
+               <version>${revision}</version>
+           </dependency>
+           <dependency>
+               <groupId>com.wechat.checkin</groupId>
+               <artifactId>we-chat-teaching-point</artifactId>
                <version>${revision}</version>
            </dependency>
         </dependencies>

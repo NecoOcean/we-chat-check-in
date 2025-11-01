@@ -18,6 +18,7 @@
     <module>we-chat-checkins</module>
     <module>we-chat-evaluation</module>
     <module>we-chat-admin</module>
+    <module>we-chat-teaching-point</module>
   </modules>
   <properties>
     <java.version>17</java.version>
@@ -75,6 +76,11 @@
       <dependency>
         <groupId>com.wechat.checkin</groupId>
         <artifactId>we-chat-admin</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.wechat.checkin</groupId>
+        <artifactId>we-chat-teaching-point</artifactId>
         <version>1.0.0</version>
       </dependency>
     </dependencies>

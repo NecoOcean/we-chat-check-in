@@ -84,16 +84,22 @@ public enum ResultCode {
     DATA_ALREADY_EXISTS(1702, "数据已存在"),
     DATA_INTEGRITY_VIOLATION(1703, "数据完整性约束违反"),
     
-    // 文件相关错误 18xx
-    FILE_NOT_FOUND(1801, "文件不存在"),
-    FILE_UPLOAD_FAILED(1802, "文件上传失败"),
-    FILE_TYPE_NOT_SUPPORTED(1803, "文件类型不支持"),
-    FILE_SIZE_EXCEEDED(1804, "文件大小超出限制"),
+    // 教学点相关错误 18xx（原18xx文件相关错误移至19xx）
+    TEACHING_POINT_NOT_FOUND(1801, "教学点不存在"),
+    TEACHING_POINT_ALREADY_EXISTS(1802, "教学点已存在"),
+    TEACHING_POINT_NAME_EXISTS(1803, "教学点名称已存在"),
+    TEACHING_POINT_DELETED(1804, "教学点已被删除"),
     
-    // 外部服务错误 19xx
-    WECHAT_API_ERROR(1901, "微信接口调用失败"),
-    SMS_SEND_FAILED(1902, "短信发送失败"),
-    EMAIL_SEND_FAILED(1903, "邮件发送失败");
+    // 文件相关错误 19xx（原18xx移至19xx）
+    FILE_NOT_FOUND(1901, "文件不存在"),
+    FILE_UPLOAD_FAILED(1902, "文件上传失败"),
+    FILE_TYPE_NOT_SUPPORTED(1903, "文件类型不支持"),
+    FILE_SIZE_EXCEEDED(1904, "文件大小超出限制"),
+    
+    // 外部服务错误 20xx（原19xx移至20xx）
+    WECHAT_API_ERROR(2001, "微信接口调用失败"),
+    SMS_SEND_FAILED(2002, "短信发送失败"),
+    EMAIL_SEND_FAILED(2003, "邮件发送失败");
 
     /**
      * 状态码
